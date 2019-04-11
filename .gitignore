@@ -1,0 +1,8 @@
+config.json
+node_modules/
+*.swp
+*.swo
+*.swn
+.DS_Store*
+test.js
+local-storage/
