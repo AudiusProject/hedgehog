@@ -21,7 +21,6 @@ const mode = 'aes-256-cbc'
 // primary account management key for HD wallet
 const PATH = "m/44'/60'/0'/0/0"
 const audiusEntropyKey = 'audius-entropy-key'
-const encryptPrefixStr = 'audius-entropy:::'
 
 // Contains functions to help create and maintain user accounts client side
 // The reason many functions return both buffer and hex strings is because different
