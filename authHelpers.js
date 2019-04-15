@@ -1,3 +1,9 @@
+/**
+ * WARNING!
+ * This file should NOT be modified unless you know what you're doing.
+ * All public functions are exposed via hedgehog.js 
+ */
+
 const bip39 = require('bip39')
 const hdkey = require('ethereumjs-wallet/hdkey')
 const randomBytes = require('randombytes')
