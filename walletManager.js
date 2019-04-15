@@ -1,5 +1,5 @@
 const Utils = require('./utils')
-const AuthHelpers = require('./authHelpers')
+const Authentication = require('./authentication')
 
 let localStorageReference
 if (typeof window === 'undefined' || window === null) {
@@ -21,11 +21,11 @@ class WalletManager {
   static async createWalletObj (password) {
     let self = this
 
-    const { ivBuffer, ivHex } = AuthHelpers.createIV()
-    const { keyBuffer } = await AuthHelpers.createKey(password, ivHex)
-    const { entropy } = AuthHelpers.generateMnemonicAndEntropy()
-    let walletObj = AuthHelpers.generateWalletFromEntropy(entropy, PATH)
-    const { cipherTextHex } = AuthHelpers.encrypt(entropy, ivBuffer, keyBuffer)
+    const { ivBuffer, ivHex } = Authentication.createIV()
+    const { keyBuffer } = await Authentication.createKey(password, ivHex)
+    const { entropy } = Authentication.generateMnemonicAndEntropy()
+    let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
+    const { cipherTextHex } = Authentication.encrypt(entropy, ivBuffer, keyBuffer)
 
     self.setEntropyInLocalStorage(entropy)
     return { ivHex: ivHex, cipherTextHex: cipherTextHex, walletObj: walletObj, entropy: entropy }
@@ -33,10 +33,10 @@ class WalletManager {
 
   static async decryptCipherTextAndRetrieveWallet (password, ivHex, cipherTextHex) {
     let self = this
-    const { keyBuffer } = await AuthHelpers.createKey(password, ivHex)
+    const { keyBuffer } = await Authentication.createKey(password, ivHex)
     const ivBuffer = Utils.bufferFromHexString(ivHex)
-    const decryptedEntrophy = AuthHelpers.decrypt(ivBuffer, keyBuffer, cipherTextHex)
-    let walletObj = AuthHelpers.generateWalletFromEntropy(decryptedEntrophy, PATH)
+    const decryptedEntrophy = Authentication.decrypt(ivBuffer, keyBuffer, cipherTextHex)
+    let walletObj = Authentication.generateWalletFromEntropy(decryptedEntrophy, PATH)
 
     return { walletObj: walletObj, entropy: decryptedEntrophy }
   }
@@ -49,7 +49,7 @@ class WalletManager {
     // This iv is hardcoded because the auth lookup key should be deterministically
     // generated given the same email and password
     const ivHex = '0x4f7242b39969c3ac4c6712524d633ce9'
-    const { keyHex } = await AuthHelpers.createKey(email + ':::' + password, ivHex)
+    const { keyHex } = await Authentication.createKey(email + ':::' + password, ivHex)
 
     return keyHex
   }
@@ -59,7 +59,7 @@ class WalletManager {
     let entropy = localStorageReference.getItem(audiusEntropyKey)
 
     if (entropy && entropy !== 'undefined') {
-      let walletObj = AuthHelpers.generateWalletFromEntropy(entropy, PATH)
+      let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
       return walletObj
     } else return false
   }
