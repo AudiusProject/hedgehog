@@ -1,7 +1,7 @@
 /**
  * WARNING!
  * This file should NOT be modified unless you know what you're doing.
- * All public functions are exposed via hedgehog.js 
+ * All public functions are exposed via hedgehog.js and walletManager.js
  */
 
 const bip39 = require('bip39')
@@ -15,6 +15,7 @@ const Utils = require('./utils')
 const authWorker = require('./authWorker.js')
 
 const mode = 'aes-256-cbc'
+const encryptPrefixStr = 'hedgehog-entropy:::'
 
 class Authentication {
   /**
@@ -103,7 +104,7 @@ class Authentication {
    */
   static encrypt (entropy, ivBuffer, keyBuffer) {
     let encryptFn = Cipher.createCipheriv(mode, keyBuffer, ivBuffer)
-    const entropyBuffer = Utils.createEncryptBuffer(entropy)
+    const entropyBuffer = this.createEncryptBuffer(entropy)
     let cipherText = BufferSafe.concat([encryptFn.update(entropyBuffer), encryptFn.final()])
     let cipherTextHex = cipherText.toString('hex')
 
@@ -123,8 +124,35 @@ class Authentication {
     let decryptFn = Cipher.createDecipheriv(mode, keyBuffer, ivBuffer)
     let cipherText = BufferSafe.from(Utils.bufferFromHexString(cipherTextHex))
     let decryptedEntorpyBuffer = BufferSafe.concat([decryptFn.update(cipherText), decryptFn.final()])
-    let decryptedEntropy = Utils.verifyDecryptString(decryptedEntorpyBuffer)
+    let decryptedEntropy = this.verifyDecryptString(decryptedEntorpyBuffer)
     return decryptedEntropy
+  }
+
+  /**
+   * This prepends the encryptPrefixStr to the entropy, converts it to a buffer and returns the buffer
+   * @param {String} entropy hex string of entropy
+   * @returns {Buffer} buffer ready to encrypt via encryptFn
+   */
+  static createEncryptBuffer (entropy) {
+    let buff = BufferSafe.from(encryptPrefixStr + entropy, 'utf8')
+    return buff
+  }
+
+  // This accepts a buffer of the entropy, converts it to utf8 to check if the encryptPrefixStr
+  // is present and returns the entropy string if valid, otherwise it throws an error
+  /**
+   * This converts the buffer returned by the decryption function, checks that the integrity
+   * string exists so we know that the same encrypted value has been decrypted, parses the
+   * entropy and returns
+   * @param {Buffer} decryptedEntropyBuffer value returned by decryptFn decryption
+   * @returns {String} entropy hex string
+   */
+  static verifyDecryptString (decryptedEntropyBuffer) {
+    let decryptedEntrophy = decryptedEntropyBuffer.toString('utf8')
+
+    if (decryptedEntrophy && decryptedEntrophy.indexOf(encryptPrefixStr) === 0) {
+      return decryptedEntrophy.split(encryptPrefixStr)[1]
+    } else throw new Error('Could not verify integrity of decrypted string')
   }
 }
 

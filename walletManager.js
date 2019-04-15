@@ -10,8 +10,9 @@ if (typeof window === 'undefined' || window === null) {
 }
 
 // primary account management key for HD wallet
+// TODO - make these options that can be overridden
 const PATH = "m/44'/60'/0'/0/0"
-const audiusEntropyKey = 'audius-entropy-key'
+const hedgehogEntropyKey = 'hedgehog-entropy-key'
 
 // Contains functions to help create and maintain user accounts client side
 // The reason many functions return both buffer and hex strings is because different
@@ -56,7 +57,7 @@ class WalletManager {
 
   static getWalletObjFromLocalStorageIfExists () {
     let self = this
-    let entropy = localStorageReference.getItem(audiusEntropyKey)
+    let entropy = localStorageReference.getItem(hedgehogEntropyKey)
 
     if (entropy && entropy !== 'undefined') {
       let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
@@ -65,7 +66,7 @@ class WalletManager {
   }
 
   static setEntropyInLocalStorage (entropy) {
-    localStorageReference.setItem(audiusEntropyKey, entropy)
+    localStorageReference.setItem(hedgehogEntropyKey, entropy)
   }
 }
 
