@@ -1,3 +1,15 @@
+const bip39 = require('bip39')
+const hdkey = require('ethereumjs-wallet/hdkey')
+const randomBytes = require('randombytes')
+const CryptoJS = require('crypto-js')
+const PBKDF2 = require('crypto-js/pbkdf2')
+const Cipher = require('browserify-cipher/browser')
+const BufferSafe = require('safe-buffer').Buffer
+const Utils = require('./utils')
+const authWorker = require('./authWorker.js')
+
+const mode = 'aes-256-cbc'
+
 class AuthHelpers {
   /**
    * Given an entropy string and a HD wallet path, return the wallet address
@@ -55,7 +67,7 @@ class AuthHelpers {
     // if this is browser side, use a web worker to create the key
     // otherwise doing it normally servier side
     if (typeof window !== 'undefined' && window && window.Worker) {
-      const worker = new Utils.WebWorker(encryptWorker.toString())
+      const worker = new Utils.WebWorker(authWorker.toString())
       worker.postMessage(JSON.stringify({ password, ivHex }))
 
       return new Promise((resolve, reject) => {
@@ -109,3 +121,5 @@ class AuthHelpers {
     return decryptedEntropy
   }
 }
+
+module.exports = AuthHelpers

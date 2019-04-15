@@ -29,15 +29,15 @@ class Hedgehog {
   async login (email, password) {
     let self = this
     let lookupKey = await Authentication.createAuthLookupKey(email, password)
-
     let data = await self.getFn({ lookupKey: lookupKey, email: email })
+
     if (data && data.iv && data.cipherText) {
-      const { wallet } = await Authentication.decryptCipherTextAndRetrieveWallet(password, data.iv, data.cipherText)
-      
-      self.wallet = wallet
-      return wallet
+      const { walletObj } = await Authentication.decryptCipherTextAndRetrieveWallet(password, data.iv, data.cipherText)
+
+      self.wallet = walletObj
+      return walletObj
     } else {
-      throw new Error('No Account record for user')
+      throw new Error('No account record for user')
     }
   }
 }
