@@ -1,4 +1,4 @@
-const Authentication = require('./authentication')
+const WalletManager = require('./walletManager')
 
 class Hedgehog {
   constructor (getFn, setFn) {
@@ -9,8 +9,8 @@ class Hedgehog {
 
   async signUp (email, password) {
     let self = this
-    const { ivHex, cipherTextHex, walletObj } = await Authentication.createWalletObj(password)
-    const lookupKey = await Authentication.createAuthLookupKey(email, password)
+    const { ivHex, cipherTextHex, walletObj } = await WalletManager.createWalletObj(password)
+    const lookupKey = await WalletManager.createAuthLookupKey(email, password)
 
     self.wallet = walletObj
     const walletAddress = walletObj.getAddressString()
@@ -28,11 +28,11 @@ class Hedgehog {
 
   async login (email, password) {
     let self = this
-    let lookupKey = await Authentication.createAuthLookupKey(email, password)
+    let lookupKey = await WalletManager.createAuthLookupKey(email, password)
     let data = await self.getFn({ lookupKey: lookupKey, email: email })
 
     if (data && data.iv && data.cipherText) {
-      const { walletObj } = await Authentication.decryptCipherTextAndRetrieveWallet(password, data.iv, data.cipherText)
+      const { walletObj } = await WalletManager.decryptCipherTextAndRetrieveWallet(password, data.iv, data.cipherText)
 
       self.wallet = walletObj
       return walletObj

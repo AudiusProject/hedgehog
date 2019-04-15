@@ -17,7 +17,7 @@ const audiusEntropyKey = 'audius-entropy-key'
 // The reason many functions return both buffer and hex strings is because different
 // packages expect different formats. So if a value is used in multiple formats, all
 // the formats are returned by the generation function
-class Authentication {
+class WalletManager {
   static async createWalletObj (password) {
     let self = this
 
@@ -69,4 +69,4 @@ class Authentication {
   }
 }
 
-module.exports = Authentication
+module.exports = WalletManager
