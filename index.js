@@ -42,5 +42,5 @@ class Hedgehog {
   }
 }
 
-module.exports = Hedgehog
+module.exports.Hedgehog = Hedgehog
 module.exports.Authentication = Authentication
