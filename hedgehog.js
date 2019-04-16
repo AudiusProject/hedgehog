@@ -2,9 +2,13 @@ const WalletManager = require('./walletManager')
 
 class Hedgehog {
   constructor (getFn, setFn) {
-    this.getFn = getFn
-    this.setFn = setFn
-    this.wallet = null
+    if (getFn && setFn) {
+      this.getFn = getFn
+      this.setFn = setFn
+      this.wallet = null
+    } else {
+      throw new Error('Please pass in valid getFn and setFn parameters into the Hedgehog constructor')
+    }
   }
 
   async signUp (email, password) {
