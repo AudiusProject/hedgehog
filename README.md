@@ -60,7 +60,7 @@ module.exports.hedgehog = hedgehog
 ```
 
 ### Code organization
-index.js - default exports
-hedgehog.js - primary API meant for consumption
-walletManager.js - wallet mangement including localstorage, and end to end authentication
-authentication.js - low level authentication functions to perform individual tasks(eg create iv, encrypt hash etc)
+* index.js - default exports for the npm module
+* hedgehog.js -  onstructor with primary consumable public facing API
+* walletManager.js - wallet mangement logic including localstorage, and end to end authentication functionality
+* authentication.js - low level authentication functions to perform individual tasks(eg create iv, encrypt hash etc)
