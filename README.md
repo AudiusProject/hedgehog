@@ -1,6 +1,6 @@
-# Hedgehog
-
+# Hedgehog - TODO
 A drop-in replacement for Metamask to manage private keys and credentials client side
+
 
 ## Installation
 
