@@ -33,7 +33,6 @@ class WalletManager {
   }
 
   static async decryptCipherTextAndRetrieveWallet (password, ivHex, cipherTextHex) {
-    let self = this
     const { keyBuffer } = await Authentication.createKey(password, ivHex)
     const ivBuffer = Utils.bufferFromHexString(ivHex)
     const decryptedEntrophy = Authentication.decrypt(ivBuffer, keyBuffer, cipherTextHex)
@@ -43,8 +42,6 @@ class WalletManager {
   }
 
   static async createAuthLookupKey (email, password) {
-    let self = this
-
     // lowercase email so the lookupKey is consistently generated to search in the database
     email = email.toLowerCase()
     // This iv is hardcoded because the auth lookup key should be deterministically
@@ -56,7 +53,6 @@ class WalletManager {
   }
 
   static getWalletObjFromLocalStorageIfExists () {
-    let self = this
     let entropy = localStorageReference.getItem(hedgehogEntropyKey)
 
     if (entropy && entropy !== 'undefined') {

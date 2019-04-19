@@ -51,11 +51,10 @@ class Hedgehog {
 
   restoreLocalSession () {
     const walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
-    if (walletObj){
+    if (walletObj) {
       this.wallet = walletObj
       return walletObj
-    }
-    else return null
+    } else return null
   }
 
   async createWalletObj (password) {

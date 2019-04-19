@@ -1,5 +1,3 @@
-const BufferSafe = require('safe-buffer').Buffer
-
 
 class Utils {
   // helpers to convert buffer to and from hex strings
