@@ -13,7 +13,9 @@ Hedgehog is available as an [npm package]().
 After installing the npm package as a dependency, initialize the module like such.
 
 ```js
-const { Hedgehog, WalletManager, Authentication } = require('@audius/hedgehog')
+// WalletManager and Authentication imports are possible but not recommended
+// and should only be used by advanced users
+const { Hedgehog, /*WalletManager, Authentication */ } = require('@audius/hedgehog')
 const axios = require('axios')
 
 // This is a helper function that makes XHR requests to a server of your choice
@@ -54,8 +56,9 @@ const getFn = async (obj) => {
 
 const hedgehog = new Hedgehog(getFn, setFn)
 
-module.exports.WalletManager = WalletManager
-module.exports.hedgehog = hedgehog
+// TODO(DM) - examples of using the public API
+
+module.exports = hedgehog
 
 ```
 

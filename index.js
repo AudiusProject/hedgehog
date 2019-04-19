@@ -5,5 +5,5 @@ const Hedgehog = require('./hedgehog')
 module.exports = {
   Hedgehog,
   WalletManager,
-  Authentication,
+  Authentication
 }

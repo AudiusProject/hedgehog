@@ -44,6 +44,29 @@ class Hedgehog {
       throw new Error('No account record for user')
     }
   }
+
+  isLoggedIn () {
+    return !!this.wallet
+  }
+
+  restoreLocalSession () {
+    const walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
+    if (walletObj){
+      this.wallet = walletObj
+      return walletObj
+    }
+    else return null
+  }
+
+  async createWalletObj (password) {
+    if (password) {
+      const { walletObj } = WalletManager.createWalletObj(password)
+      this.wallet = walletObj
+      return walletObj
+    } else {
+      throw new Error('Please pass in a valid password')
+    }
+  }
 }
 
 module.exports = Hedgehog
