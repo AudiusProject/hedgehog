@@ -64,13 +64,12 @@ class WalletManager {
 
   static getWalletObjFromLocalStorageIfExists () {
     let entropy = this.getEntropyFromLocalStorage()
-    if(entropy) {
+    if (entropy) {
       let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
-      
-      if(walletObj) return walletObj
+
+      if (walletObj) return walletObj
       else return null
-    }
-    else return null
+    } else return null
   }
 
   static setEntropyInLocalStorage (entropy) {
@@ -80,7 +79,6 @@ class WalletManager {
   static deleteEntropyFromLocalStorage () {
     localStorageReference.removeItem(hedgehogEntropyKey)
   }
-
 }
 
 module.exports = WalletManager

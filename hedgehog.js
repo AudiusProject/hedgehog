@@ -74,9 +74,9 @@ class Hedgehog {
   }
 
   /**
-   * Returns is the user has a client side wallet. If they do, calls can be made against 
+   * Returns is the user has a client side wallet. If they do, calls can be made against
    * that wallet, if they don't the user has to login or signup
-   * @returns {Boolean} true if the user has a client side wallet, false otherwise 
+   * @returns {Boolean} true if the user has a client side wallet, false otherwise
    */
   isLoggedIn () {
     return !!this.wallet
@@ -92,7 +92,7 @@ class Hedgehog {
 
   walletExistsLocally () {
     let entropy = WalletManager.getEntropyFromLocalStorage()
-    if(entropy) return true
+    if (entropy) return true
     else return false
   }
 

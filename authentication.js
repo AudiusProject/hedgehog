@@ -134,26 +134,26 @@ class Authentication {
    * @param {String} entropy hex string of entropy
    * @returns {Buffer} buffer ready to encrypt via encryptFn
    */
-  function createEncryptBuffer (entropy) {
-    let buff = BufferSafe.from(encryptPrefixStr + entropy, 'utf8')
-    return buff
-  }
+function createEncryptBuffer (entropy) {
+  let buff = BufferSafe.from(encryptPrefixStr + entropy, 'utf8')
+  return buff
+}
 
-  // This accepts a buffer of the entropy, converts it to utf8 to check if the encryptPrefixStr
-  // is present and returns the entropy string if valid, otherwise it throws an error
-  /**
+// This accepts a buffer of the entropy, converts it to utf8 to check if the encryptPrefixStr
+// is present and returns the entropy string if valid, otherwise it throws an error
+/**
    * This converts the buffer returned by the decryption function, checks that the integrity
    * string exists so we know that the same encrypted value has been decrypted, parses the
    * entropy and returns
    * @param {Buffer} decryptedEntropyBuffer value returned by decryptFn decryption
    * @returns {String} entropy hex string
    */
-  function verifyDecryptString (decryptedEntropyBuffer) {
-    let decryptedEntrophy = decryptedEntropyBuffer.toString('utf8')
+function verifyDecryptString (decryptedEntropyBuffer) {
+  let decryptedEntrophy = decryptedEntropyBuffer.toString('utf8')
 
-    if (decryptedEntrophy && decryptedEntrophy.indexOf(encryptPrefixStr) === 0) {
-      return decryptedEntrophy.split(encryptPrefixStr)[1]
-    } else throw new Error('Could not verify integrity of decrypted string')
-  }
+  if (decryptedEntrophy && decryptedEntrophy.indexOf(encryptPrefixStr) === 0) {
+    return decryptedEntrophy.split(encryptPrefixStr)[1]
+  } else throw new Error('Could not verify integrity of decrypted string')
+}
 
 module.exports = Authentication

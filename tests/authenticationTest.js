@@ -12,18 +12,18 @@ const addressStr = '0xd20ec9deee07b4bdeb28ed5d6dd070cb33c5aa45'
 describe('Authentication', async function () {
   it('should create a wallet given entropy', async function () {
     const wallet = Authentication.generateWalletFromEntropy(entropy, PATH)
-    
+
     // This address is deterministic given an entropy and path
     assert.deepStrictEqual(wallet.getAddressString(), addressStr)
   })
 
   it('should generate a mnemonic and entropy', async function () {
     const data = Authentication.generateMnemonicAndEntropy()
-    
+
     assert.notDeepStrictEqual(data.mnemonic, null)
     assert.notDeepStrictEqual(data.entropy, null)
   })
-  
+
   it('should create an initialization vector', async function () {
     const iv = Authentication.createIV()
 
@@ -32,7 +32,7 @@ describe('Authentication', async function () {
   })
 
   it('should create a key', async function () {
-    this.timeout(15000);
+    this.timeout(15000)
     const key = await Authentication.createKey(password, ivHex)
 
     assert.deepStrictEqual(key.keyHex, keyHex)

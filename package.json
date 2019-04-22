@@ -29,7 +29,9 @@
       "Blob",
       "self",
       "Worker",
-      "postMessage"
+      "postMessage",
+      "describe", 
+      "it"
     ]
   },
   "author": "",
