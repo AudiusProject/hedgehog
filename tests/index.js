@@ -1,0 +1,2 @@
+require('./authenticationTest')
+require('./walletManagerTest')
