@@ -52,10 +52,24 @@ class WalletManager {
     return keyHex
   }
 
+  static getEntropyFromLocalStorage () {
+    let entropy = localStorageReference.getItem(hedgehogEntropyKey)
+
+    // Sometimes the string 'undefined' was being written to localstorage
+    // this is an explicit check for that
+    if (entropy && entropy !== 'undefined') {
+      return entropy
+    } else return null
+  }
+
   static getWalletObjFromLocalStorageIfExists () {
-    let entropy = getEntropyFromLocalStorage()
-    let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
-    if(walletObj) return walletObj
+    let entropy = this.getEntropyFromLocalStorage()
+    if(entropy) {
+      let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
+      
+      if(walletObj) return walletObj
+      else return null
+    }
     else return null
   }
 
@@ -68,16 +82,5 @@ class WalletManager {
   }
 
 }
-
-function getEntropyFromLocalStorage () {
-  let entropy = localStorageReference.getItem(hedgehogEntropyKey)
-
-  // Sometimes the string 'undefined' was being written to localstorage
-  // this is an explicit check for that
-  if (entropy && entropy !== 'undefined') {
-    return entropy
-  } else return null
-}
-
 
 module.exports = WalletManager
