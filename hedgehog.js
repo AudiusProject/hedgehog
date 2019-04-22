@@ -11,7 +11,15 @@ class Hedgehog {
     }
   }
 
+  /**
+   * Given user credentials, create a client side wallet and all other authentication artifacts,
+   * call setFn to persist the artifacts to a server and return the wallet object
+   * @param {String} email user email address
+   * @param {String} password user password
+   * @returns {Object} ethereumjs-wallet wallet object
+   */
   async signUp (email, password) {
+    // TODO (DM) - check that wallet doesn't already exist
     let self = this
     const { ivHex, cipherTextHex, walletObj } = await WalletManager.createWalletObj(password)
     const lookupKey = await WalletManager.createAuthLookupKey(email, password)
@@ -30,13 +38,24 @@ class Hedgehog {
     return walletObj
   }
 
+  /**
+   * Given user credentials, attempt to get authentication artifacts from server using
+   * getFn, create the private key using the artifacts and the user password
+   * @param {String} email user email address
+   * @param {String} password user password
+   * @returns {Object} ethereumjs-wallet wallet object
+   */
   async login (email, password) {
     let self = this
     let lookupKey = await WalletManager.createAuthLookupKey(email, password)
     let data = await self.getFn({ lookupKey: lookupKey, email: email })
 
     if (data && data.iv && data.cipherText) {
-      const { walletObj } = await WalletManager.decryptCipherTextAndRetrieveWallet(password, data.iv, data.cipherText)
+      const { walletObj } = await WalletManager.decryptCipherTextAndRetrieveWallet(
+        password,
+        data.iv,
+        data.cipherText
+      )
 
       self.wallet = walletObj
       return walletObj
@@ -45,10 +64,31 @@ class Hedgehog {
     }
   }
 
+  /**
+   * Returns is the user has a client side wallet. If they do, calls can be made against 
+   * that wallet, if they don't the user has to login or signup
+   * @returns {Boolean} true if the user has a client side wallet, false otherwise 
+   */
   isLoggedIn () {
     return !!this.wallet
   }
 
+  getWallet () {
+    return this.wallet
+  }
+
+  walletExistsLocally () {
+    let entropy = WalletManager.getEntropyFromLocalStorage()
+    if(entropy) return true
+    else return false
+  }
+
+  /**
+   * If a user refreshes or navigates away from the page and comes back later, this attempts
+   * to restore the client side wallet from localStorage, if it exists
+   * @returns {Object/null} If the user has a wallet client side, the wallet object is returned,
+   *                        otherwise null is returned
+   */
   restoreLocalSession () {
     const walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
     if (walletObj) {
@@ -57,6 +97,12 @@ class Hedgehog {
     } else return null
   }
 
+  /**
+   * Create a new client side wallet object without going through the signup flow. This is useful
+   * if you need a temporary, read-only wallet that is ephemeral and does not need to be persisted
+   * @param {String} password user password
+   * @returns {Object} ethereumjs-wallet wallet object
+   */
   async createWalletObj (password) {
     if (password) {
       const { walletObj } = WalletManager.createWalletObj(password)

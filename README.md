@@ -10,9 +10,13 @@ Hedgehog is available as an [npm package]().
 `npm install @audius/hedgehog`
 
 ## Usage
-After installing the npm package as a dependency, initialize the module like such.
+`hedgehogWrapper.js` is the hedgehog module initialization and configuration that exports a `hedgehog` object for the rest of your code to consume.
+
+`hedgehogAPI.js` is the public facing API exposed by hedgehog that can be used
 
 ```js
+// hedgehogWrapper.js
+
 // WalletManager and Authentication imports are possible but not recommended
 // and should only be used by advanced users
 const { Hedgehog, /*WalletManager, Authentication */ } = require('@audius/hedgehog')
@@ -56,10 +60,41 @@ const getFn = async (obj) => {
 
 const hedgehog = new Hedgehog(getFn, setFn)
 
-// TODO(DM) - examples of using the public API
-
 module.exports = hedgehog
 
+```
+
+```js
+const hedgehog = require('./hedgehogWrapper')
+
+// Returning user login login flow
+let walletObj
+
+try {
+  if (hedgehog.isLoggedIn()) {
+    walletObj = hedgehog.getWallet()
+  } else {
+    if (hedgehog.walletExistsLocally()) {
+      walletObj = hedgehog.restoreLocalSession()      
+    } else {
+      // Ask for email/password input
+      walletObj = await user.login(email, password)
+    }
+  }
+}
+catch(e) {
+  throw e
+}
+
+// New user signup flow
+let walletObj
+
+try {
+  walletObj = await hedgehog.signUp('email@domain.com', 'password')
+}
+catch(e) {
+  throw e
+}
 ```
 
 ### Code organization
