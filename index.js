@@ -1,6 +1,6 @@
-const WalletManager = require('./walletManager')
-const Authentication = require('./authentication')
-const Hedgehog = require('./hedgehog')
+const WalletManager = require('./src/walletManager')
+const Authentication = require('./src/authentication')
+const Hedgehog = require('./src/hedgehog')
 
 module.exports = {
   Hedgehog,

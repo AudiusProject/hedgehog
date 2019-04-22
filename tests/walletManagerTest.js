@@ -4,7 +4,7 @@ const { WalletManager } = require('../index')
 const entropy = '47b0e5e107cccc3297d88647c6e84a9f'
 const addressStr = '0xd20ec9deee07b4bdeb28ed5d6dd070cb33c5aa45'
 
-describe.only('WalletManager', async function () {
+describe('WalletManager', async function () {
   it('should create a wallet ', async function () {
     this.timeout(20000)
     const data = await WalletManager.createWalletObj('testpassword')
