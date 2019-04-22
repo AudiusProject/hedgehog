@@ -104,7 +104,7 @@ class Authentication {
    */
   static encrypt (entropy, ivBuffer, keyBuffer) {
     let encryptFn = Cipher.createCipheriv(mode, keyBuffer, ivBuffer)
-    const entropyBuffer = this.createEncryptBuffer(entropy)
+    const entropyBuffer = createEncryptBuffer(entropy)
     let cipherText = BufferSafe.concat([encryptFn.update(entropyBuffer), encryptFn.final()])
     let cipherTextHex = cipherText.toString('hex')
 
@@ -124,16 +124,17 @@ class Authentication {
     let decryptFn = Cipher.createDecipheriv(mode, keyBuffer, ivBuffer)
     let cipherText = BufferSafe.from(Utils.bufferFromHexString(cipherTextHex))
     let decryptedEntorpyBuffer = BufferSafe.concat([decryptFn.update(cipherText), decryptFn.final()])
-    let decryptedEntropy = this.verifyDecryptString(decryptedEntorpyBuffer)
+    let decryptedEntropy = verifyDecryptString(decryptedEntorpyBuffer)
     return decryptedEntropy
   }
+}
 
-  /**
+/**
    * This prepends the encryptPrefixStr to the entropy, converts it to a buffer and returns the buffer
    * @param {String} entropy hex string of entropy
    * @returns {Buffer} buffer ready to encrypt via encryptFn
    */
-  static createEncryptBuffer (entropy) {
+  function createEncryptBuffer (entropy) {
     let buff = BufferSafe.from(encryptPrefixStr + entropy, 'utf8')
     return buff
   }
@@ -147,13 +148,12 @@ class Authentication {
    * @param {Buffer} decryptedEntropyBuffer value returned by decryptFn decryption
    * @returns {String} entropy hex string
    */
-  static verifyDecryptString (decryptedEntropyBuffer) {
+  function verifyDecryptString (decryptedEntropyBuffer) {
     let decryptedEntrophy = decryptedEntropyBuffer.toString('utf8')
 
     if (decryptedEntrophy && decryptedEntrophy.indexOf(encryptPrefixStr) === 0) {
       return decryptedEntrophy.split(encryptPrefixStr)[1]
     } else throw new Error('Could not verify integrity of decrypted string')
   }
-}
 
 module.exports = Authentication
