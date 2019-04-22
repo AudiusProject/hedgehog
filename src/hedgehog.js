@@ -51,13 +51,17 @@ class Hedgehog {
     let data = await self.getFn({ lookupKey: lookupKey, email: email })
 
     if (data && data.iv && data.cipherText) {
-      const { walletObj } = await WalletManager.decryptCipherTextAndRetrieveWallet(
+      const { walletObj, entropy } = await WalletManager.decryptCipherTextAndRetrieveWallet(
         password,
         data.iv,
         data.cipherText
       )
 
+      // set wallet property on the class
       self.wallet = walletObj
+
+      // set entropy in localStorage
+      WalletManager.setEntropyInLocalStorage(entropy)
       return walletObj
     } else {
       throw new Error('No account record for user')
@@ -118,8 +122,9 @@ class Hedgehog {
    */
   async createWalletObj (password) {
     if (password) {
-      const { walletObj } = WalletManager.createWalletObj(password)
+      const { walletObj, entropy } = await WalletManager.createWalletObj(password)
       this.wallet = walletObj
+      WalletManager.setEntropyInLocalStorage(entropy)
       return walletObj
     } else {
       throw new Error('Please pass in a valid password')

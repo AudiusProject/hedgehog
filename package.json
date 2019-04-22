@@ -20,9 +20,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha tests/",
     "lint": "./node_modules/.bin/standard",
-    "lint-fix": "./node_modules/.bin/standard --fix"
+    "lint-fix": "./node_modules/.bin/standard --fix",
+    "test": "./node_modules/.bin/mocha tests/ && npm run lint"
   },
   "standard": {
     "globals": [
@@ -31,7 +31,8 @@
       "Worker",
       "postMessage",
       "describe", 
-      "it"
+      "it",
+      "beforeEach"
     ]
   },
   "author": "",

@@ -139,12 +139,10 @@ function createEncryptBuffer (entropy) {
   return buff
 }
 
-// This accepts a buffer of the entropy, converts it to utf8 to check if the encryptPrefixStr
-// is present and returns the entropy string if valid, otherwise it throws an error
 /**
-   * This converts the buffer returned by the decryption function, checks that the integrity
-   * string exists so we know that the same encrypted value has been decrypted, parses the
-   * entropy and returns
+   * This converts the buffer returned by the `decrypt` function to string, checks that the
+   * integrity of the string to check if the encryptPrefixStr exists so we know that the same encrypted value has
+   * been decrypted, parses the entropy and returns
    * @param {Buffer} decryptedEntropyBuffer value returned by decryptFn decryption
    * @returns {String} entropy hex string
    */
