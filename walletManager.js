@@ -73,6 +73,11 @@ class WalletManager {
   static setEntropyInLocalStorage (entropy) {
     localStorageReference.setItem(hedgehogEntropyKey, entropy)
   }
+
+  static deleteEntropyFromLocalStorage () {
+    localStorageReference.removeItem(hedgehogEntropyKey)
+  }
+
 }
 
 module.exports = WalletManager

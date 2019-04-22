@@ -65,6 +65,15 @@ class Hedgehog {
   }
 
   /**
+   * Deletes the local client side wallet including entropy and all associated
+   * authentication artifacts
+   */
+  logout () {
+    delete this.wallet
+    WalletManager.deleteEntropyFromLocalStorage()
+  }
+
+  /**
    * Returns is the user has a client side wallet. If they do, calls can be made against 
    * that wallet, if they don't the user has to login or signup
    * @returns {Boolean} true if the user has a client side wallet, false otherwise 
@@ -73,6 +82,10 @@ class Hedgehog {
     return !!this.wallet
   }
 
+  /**
+   * Returns the current user wallet
+   * @returns {Object} ethereumjs-wallet wallet object if a wallet exists, otherwise null
+   */
   getWallet () {
     return this.wallet
   }
