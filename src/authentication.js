@@ -123,8 +123,8 @@ class Authentication {
   static decrypt (ivBuffer, keyBuffer, cipherTextHex) {
     let decryptFn = Cipher.createDecipheriv(mode, keyBuffer, ivBuffer)
     let cipherText = BufferSafe.from(Utils.bufferFromHexString(cipherTextHex))
-    let decryptedEntorpyBuffer = BufferSafe.concat([decryptFn.update(cipherText), decryptFn.final()])
-    let decryptedEntropy = verifyDecryptString(decryptedEntorpyBuffer)
+    let decryptedEntropyBuffer = BufferSafe.concat([decryptFn.update(cipherText), decryptFn.final()])
+    let decryptedEntropy = verifyDecryptString(decryptedEntropyBuffer)
     return decryptedEntropy
   }
 }

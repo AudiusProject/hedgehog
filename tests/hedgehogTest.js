@@ -41,6 +41,16 @@ beforeEach(function () {
 })
 
 describe('Hedgehog', async function () {
+  it('should fail with incorrect constructor arguments', async function () {
+    try{
+      new Hedgehog()
+      assert.fail('Should not be allowed to create Hedgehog object without setFn and getFn args')
+    }
+    catch(e){
+      assert.deepStrictEqual(1, 1)
+    }
+  })
+
   it('should attempt to login without a user account - should fail ', async function () {
     this.timeout(15000)
     resetDataInDB()
@@ -95,6 +105,16 @@ describe('Hedgehog', async function () {
     assert.deepStrictEqual(walletObj, null)
   })
 
+  it('should fail if attempting to create wallet object without password', async function () {
+    try{
+      await hh.createWalletObj()
+      assert.fail('Should not allow creating a wallet object without a password')
+    }
+    catch(e){
+      assert.deepStrictEqual(1, 1)
+    }
+  })
+  
   it('should create a wallet object', async function () {
     this.timeout(15000)
     assert.deepStrictEqual(hh.isLoggedIn(), false)
