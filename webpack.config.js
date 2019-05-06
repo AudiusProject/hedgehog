@@ -1,19 +1,30 @@
-var webpack = require('webpack');
-var path = require('path');
-var libraryName = 'dist';
-var outputFile = libraryName + '.js';
+'use strict'
+
+const path = require('path')
 
 var config = {
-  entry: __dirname + '/index.js',
+  target: 'web',
+  mode: process.env.NODE_ENV || 'development',
   devtool: 'source-map',
+  entry: [
+    './index.js'
+  ],
   output: {
-    path: __dirname + '/lib',
-    filename: outputFile,
-    library: libraryName,
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    path: path.join(__dirname, 'dist'),
+    filename: 'browser.js',
+    // library: 'Hedgehog',
+    libraryTarget: 'window'
+  },
+  module: {
+    rules: [
+      {
+        test: /.jsm$/,
+        exclude: /node_modules/,
+        use: 'babel-loader'
+      }
+    ]
   }
-};
+}
 
 module.exports = config;
 
