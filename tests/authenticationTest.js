@@ -50,12 +50,11 @@ describe('Authentication', async function () {
 
   it('should not decrypt and throw error if entropy integrity cannot be verified', async function () {
     let wrongIVHex = '072251f44fda8f9aad3cc04992372bf7'
-    
-    try{
+
+    try {
       await Authentication.decrypt(Buffer.from(wrongIVHex, 'hex'), Buffer.from(keyHex, 'hex'), cipherTextHex)
       assert.fail('Should not be able to derive entropy for incorrect iv hex')
-    }
-    catch(e){
+    } catch (e) {
       assert.deepStrictEqual(1, 1)
     }
   })

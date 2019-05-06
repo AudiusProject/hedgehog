@@ -72,9 +72,9 @@ class Authentication {
    */
   static async createKey (password, ivHex) {
     // if this is browser side, use a web worker to create the key
-    // otherwise doing it normally servier side
+    // otherwise doing it normally server side
     if (typeof window !== 'undefined' && window && window.Worker) {
-      const worker = new Utils.WebWorker(authWorker.toString())
+      const worker = Utils.WebWorker(authWorker.toString())
       worker.postMessage(JSON.stringify({ password, ivHex }))
 
       return new Promise((resolve, reject) => {

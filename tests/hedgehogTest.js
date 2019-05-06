@@ -42,11 +42,10 @@ beforeEach(function () {
 
 describe('Hedgehog', async function () {
   it('should fail with incorrect constructor arguments', async function () {
-    try{
-      new Hedgehog()
+    try {
+      Hedgehog()
       assert.fail('Should not be allowed to create Hedgehog object without setFn and getFn args')
-    }
-    catch(e){
+    } catch (e) {
       assert.deepStrictEqual(1, 1)
     }
   })
@@ -106,15 +105,14 @@ describe('Hedgehog', async function () {
   })
 
   it('should fail if attempting to create wallet object without password', async function () {
-    try{
+    try {
       await hh.createWalletObj()
       assert.fail('Should not allow creating a wallet object without a password')
-    }
-    catch(e){
+    } catch (e) {
       assert.deepStrictEqual(1, 1)
     }
   })
-  
+
   it('should create a wallet object', async function () {
     this.timeout(15000)
     assert.deepStrictEqual(hh.isLoggedIn(), false)
