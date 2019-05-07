@@ -1,13 +1,7 @@
 const assert = require('assert')
 const { Authentication } = require('../index')
 
-const PATH = "m/44'/60'/0'/0/0"
-const ivHex = '072251f44fda8f9aad3cc04992372bf6'
-const keyHex = '2f106076998c4ca94bfde584968c6945192ce19618d10d52d8c3ad3f8f87009b'
-const entropy = '47b0e5e107cccc3297d88647c6e84a9f'
-const password = 'testpassword'
-const cipherTextHex = '9dba56a2d0c3cdd6184938658bfbb8ed7c1e582f58343d76c9bcc8e8026ccc5c772a6240928ba37db3cc678ad12f8927dc93d604182a029dab248ab84db9ccae'
-const addressStr = '0xd20ec9deee07b4bdeb28ed5d6dd070cb33c5aa45'
+const { PATH, ivHex, keyHex, entropy, password, cipherTextHex, addressStr } = require('./helpers')
 
 describe('Authentication', async function () {
   it('should create a wallet given entropy', async function () {

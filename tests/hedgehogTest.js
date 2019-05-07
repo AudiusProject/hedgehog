@@ -1,13 +1,9 @@
 const assert = require('assert')
 const { Hedgehog, WalletManager } = require('../index')
+const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, email } = require('./helpers')
 
 var hh = null
 var data = null
-
-const entropy = '47b0e5e107cccc3297d88647c6e84a9f'
-const addressStr = '0xd20ec9deee07b4bdeb28ed5d6dd070cb33c5aa45'
-const email = 'email@address.com'
-const password = 'testpassword'
 
 // Makeshift DB logic
 const getFn = (obj) => {
@@ -26,11 +22,11 @@ const setDataInDB = (d) => {
 
 // email is `email@address.com`, password is `testpassword`
 const authArtifacts = {
-  'iv': 'c112af7cfd50b6155e56952ef26afe96',
-  'cipherText': 'de9e25a4f7e041fd999463a9312cb4737c07382182d3b83d0d38e8f2fbbcba713070cd21751e2423373fc1eed20ad6340b77da8ab8701cd74dbce5eefb927523',
-  'lookupKey': '6cb45551ead35655c833c947a282eff6ae5897895c3249dc935624e8af6fdbd9',
-  'email': 'email@address.com',
-  'ownerWallet': '0x692612b50cafb6c61cd2d934b5af5615c38b693d'
+  iv: ivHex,
+  cipherText: cipherTextHex,
+  ownerWallet: addressStr,
+  lookupKey,
+  email
 }
 
 beforeEach(function () {
