@@ -5,21 +5,30 @@
 // exports etc.
 
 module.exports = function () {
-  self.importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js')
+  // Package and deps for https://github.com/ricmoo/scrypt-js
+  self.importScripts('https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/scrypt.min.js')
+  self.importScripts('https://raw.githack.com/ricmoo/scrypt-js/master/thirdparty/buffer.js')
 
   const createKey = (password, ivHex) => {
-    const cryptoIV = self.CryptoJS.enc.Utf8.parse(ivHex) // cryptoJS expects the iv to be in this special format
-    const key = self.CryptoJS.PBKDF2(password, cryptoIV, { keySize: 8, iterations: 50000, hasher: self.CryptoJS.algo.SHA512 })
+    const passwordBuffer = self.buffer.SlowBuffer(password)
+    const ivBuffer = self.buffer.SlowBuffer(ivHex)
 
-    // This is the private key
-    const keyHex = key.toString(self.CryptoJS.enc.Hex)
-    let keyBuffer = bufferFromHexString(keyHex)
+    const N = 32768
+    const r = 8
+    const p = 1
+    const dkLen = 32
 
-    postMessage({ keyHex: keyHex, keyBuffer: keyBuffer })
-  }
-
-  function bufferFromHexString (hexString) {
-    return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+    self.scrypt(passwordBuffer, ivBuffer, N, r, p, dkLen, function (error, progress, key) {
+      if (error) {
+        throw error
+      } else if (key) {
+        key = new self.buffer.SlowBuffer(key)
+        const keyHex = key.toString('hex')
+        postMessage({ keyHex: keyHex, keyBuffer: key })
+      } else {
+        throw new Error('did not get a valid key from scrypt')
+      }
+    })
   }
 
   self.onmessage = e => {

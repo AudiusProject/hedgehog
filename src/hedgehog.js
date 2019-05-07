@@ -21,21 +21,31 @@ class Hedgehog {
   async signUp (email, password) {
     // TODO (DM) - check that wallet doesn't already exist
     let self = this
-    const { ivHex, cipherTextHex, walletObj } = await WalletManager.createWalletObj(password)
-    const lookupKey = await WalletManager.createAuthLookupKey(email, password)
 
-    self.wallet = walletObj
-    const walletAddress = walletObj.getAddressString()
+    const createWalletPromise = WalletManager.createWalletObj(password)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(email, password)
 
-    const data = {
-      iv: ivHex,
-      cipherText: cipherTextHex,
-      lookupKey: lookupKey,
-      email: email,
-      ownerWallet: walletAddress
+    try {
+      let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+
+      const { ivHex, cipherTextHex, walletObj } = result[0]
+      const lookupKey = result[1]
+
+      self.wallet = walletObj
+      const walletAddress = walletObj.getAddressString()
+
+      const data = {
+        iv: ivHex,
+        cipherText: cipherTextHex,
+        lookupKey: lookupKey,
+        email: email,
+        ownerWallet: walletAddress
+      }
+      await self.setFn(data)
+      return walletObj
+    } catch (e) {
+      throw e
     }
-    await self.setFn(data)
-    return walletObj
   }
 
   /**

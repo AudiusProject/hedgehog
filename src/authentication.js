@@ -7,8 +7,7 @@
 const bip39 = require('bip39')
 const hdkey = require('ethereumjs-wallet/hdkey')
 const randomBytes = require('randombytes')
-const CryptoJS = require('crypto-js')
-const PBKDF2 = require('crypto-js/pbkdf2')
+const crypto = require('crypto')
 const Cipher = require('browserify-cipher/browser')
 const BufferSafe = require('safe-buffer').Buffer
 const Utils = require('./utils')
@@ -71,27 +70,41 @@ class Authentication {
    *                    keyBuffer: Uint8Array(32)[220, 75, 100, 242, 179...]}
    */
   static async createKey (password, ivHex) {
-    // if this is browser side, use a web worker to create the key
-    // otherwise doing it normally server side
-    if (typeof window !== 'undefined' && window && window.Worker) {
-      const worker = Utils.WebWorker(authWorker.toString())
-      worker.postMessage(JSON.stringify({ password, ivHex }))
+    return new Promise((resolve, reject) => {
+      // if this is browser side, use a web worker to create the key
+      // otherwise doing it normally server side
+      if (typeof window !== 'undefined' && window && window.Worker) {
+        const worker = Utils.WebWorker(authWorker.toString())
+        worker.postMessage(JSON.stringify({ password, ivHex }))
 
-      return new Promise((resolve, reject) => {
         worker.onmessage = event => {
           resolve(event.data)
         }
-      })
-    } else {
-      const cryptoIV = CryptoJS.enc.Utf8.parse(ivHex) // cryptoJS expects the iv to be in this special format
-      const key = PBKDF2(password, cryptoIV, { keySize: 8, iterations: 50000, hasher: CryptoJS.algo.SHA512 })
+      } else {
+        const N = 32768
+        const r = 8
+        const p = 1
+        const dkLen = 32
+        const passwordBuffer = Buffer.from(password)
+        const ivBuffer = Buffer.from(ivHex)
+        // https://github.com/nodejs/node/issues/21524#issuecomment-400012811
+        const maxmem = 128 * p * r + 128 * (2 + N) * r
 
-      // This is the private key
-      const keyHex = key.toString(CryptoJS.enc.Hex)
-      let keyBuffer = Utils.bufferFromHexString(keyHex)
+        crypto.scrypt(passwordBuffer, ivBuffer, dkLen, { N, r, p, maxmem }, (err, derivedKey) => {
+          if (err) {
+            reject(err)
+          } else {
+            const keyHex = derivedKey.toString('hex')
+            console.log('keyHex', derivedKey, keyHex)
 
-      return { keyHex: keyHex, keyBuffer: keyBuffer }
-    }
+            // This is the private key
+            let keyBuffer = Utils.bufferFromHexString(keyHex)
+
+            resolve({ keyHex: keyHex, keyBuffer: keyBuffer })
+          }
+        })
+      }
+    })
   }
 
   /**
