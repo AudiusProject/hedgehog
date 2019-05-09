@@ -6,10 +6,13 @@ Table of contents
 
 <!--ts-->
    * [Installation](#installation)
+   * [Technical Overview](#technical-overview)
+   * * [Wallet creation](#wallet-creation)
+   * * [Wallet management](#wallet-management)
+   * * [Code Organization](#code-organization)
+   * * [Security Considerations](#security-considerations)
    * [Usage](#usage)
    * [API](#api)
-   * [Technical Overview](#technical-overview)
-   * [Security Considerations](#security-considerations)
 <!--te-->
 
 
@@ -24,7 +27,7 @@ Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. 
 
 #### Wallet creation
 
-Wallets are created by first generating a wallet seed and entropy as per the BIP-39 spec. The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the BIP-32 spec. The wallet generated from the path is an object returned by the `ethereumjs-wallet` npm package. This wallet is stored in the `wallet` property in the Hedgehog class. 
+Wallets are created by first generating a wallet seed and entropy as per the BIP-39 spec. The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the BIP-32 spec. This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. This entropy can be read from localStorage when a user comes back to your app, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class available for use by any application using Hedgehog. The wallet is an object returned by the `ethereumjs-wallet` npm package.
 
 In addition to the entropy itself, Hedgehog generates auth artifacts that contain the entropy encrypted in a ciphertext along with the user's password. These auth artifacts can be securely stored in an encrypted database. The entropy can be re-generated with the users email and password, which are taken as inputs on the client side and never sent from the browser. Using the ciphertext and the user's password, the entropy can be derived and used client side.
 
@@ -49,8 +52,15 @@ The Hedgehog package has been organized into several files with varying degrees 
 * <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
 * <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
 
+#### Security Considerations
+
+All third party javascript should be audited for localStorage access. If a library accesses localStorage and extracts all keys, it could present a possible data breach
+
+Email should be stored separately from auth artifacts. The table containing the authentication values should be independent with no relation to the table storing email addresses
+
 ## Usage
 
+The code below shows a simple wrapper to integrate Hedgehog into your own application. For a fully working end-to-end example, please see the Codepen demo [here](http://www.google.com)
 ```js
 /**
  * hedgehogWrapper.js
@@ -201,8 +211,3 @@ restoreLocalWallet ()
    */
 async createWalletObj (password)
 ```
-
-## Security Considerations[TODO]
-
-- Localstorage should be audited
-- Email shouldn't be stored with auth artifacts
