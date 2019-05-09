@@ -20,13 +20,6 @@ Hedgehog is available as an [npm package]().
 
 ## Technical Overview
 
-The Hedgehog package has been organized into several files with varying levels of control to control its behavior.
-
-* <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
-* <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
-* <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
-* <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
-
 Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
 
 #### Wallet creation
@@ -46,6 +39,15 @@ There are three wallet states in Hedgehog.
 3. When a user has the entropy in local storage and a wallet object in Hedgehog
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
+
+#### Code Organization
+
+The Hedgehog package has been organized into several files with varying degrees of control.
+
+* <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
+* <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
+* <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
+* <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
 
 ## Usage
 
