@@ -18,6 +18,34 @@ Hedgehog is available as an [npm package]().
 
 `npm install --save @audius/hedgehog`
 
+## Technical Overview
+
+The Hedgehog package has been organized into several files with varying levels of control to control its behavior.
+
+* <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
+* <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
+* <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
+* <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
+
+Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
+
+#### Wallet creation
+
+Wallets are created by first generating a wallet seed and entropy as per the BIP-39 spec. The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the BIP-32 spec. The wallet generated from the path is an object returned by the `ethereumjs-wallet` npm package. This wallet is stored in the `wallet` property in the Hedgehog class. 
+
+In addition to the entropy itself, Hedgehog generates auth artifacts that contain the entropy encrypted in a ciphertext along with the user's password. These auth artifacts can be securely stored in an encrypted database. The entropy can be re-generated with the users email and password, which are taken as inputs on the client side and never sent from the browser. Using the ciphertext and the user's password, the entropy can be derived and used client side.
+
+#### Wallet management
+
+There are three wallet states in Hedgehog. 
+
+1. When a user has neither the entropy in local storage nor a wallet object in Hedgehog
+
+2. When a user has the entropy in local storage, but no wallet object in Hedgehog
+
+3. When a user has the entropy in local storage and a wallet object in Hedgehog
+
+For API of functions to access and modify wallet state, please see the [API](#api) section
 
 ## Usage
 
@@ -117,7 +145,7 @@ The functions exposed via hedgehog are:
    * call setFn to persist the artifacts to a server and return the wallet object
    * @param {String} email user email address
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
 async signUp (email, password)
 
@@ -126,7 +154,7 @@ async signUp (email, password)
    * getFn, create the private key using the artifacts and the user password
    * @param {String} email user email address
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
 async login (email, password)
 
@@ -145,7 +173,7 @@ isLoggedIn ()
 
 /**
    * Returns the current user wallet
-   * @returns ethereumjs-wallet wallet object if a wallet exists, otherwise null
+   * @returns {Object} ethereumjs-wallet wallet object if a wallet exists, otherwise null
    */
 getWallet ()
 
@@ -167,45 +195,12 @@ restoreLocalWallet ()
    * Create a new client side wallet object without going through the signup flow. This is useful
    * if you need a temporary, read-only wallet that is ephemeral and does not need to be persisted
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
 async createWalletObj (password)
 ```
 
-
-## Technical Overview
-
-The Hedgehog package has been organized into several files with varying levels of control to control its behavior.
-
-* <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
-* <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
-* <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
-* <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
-
-Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
-
-#### Wallet creation
-
-Wallets are created by first generating a wallet seed and entropy as per the BIP-39 spec. The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the BIP-32 spec. The wallet generated from the path is an object returned by the `ethereumjs-wallet` npm package. This wallet is stored in the `wallet` property in the Hedgehog class. 
-
-In addition to the entropy itself, Hedgehog generates auth artifacts that contain the entropy encrypted in a ciphertext along with the user's password. These auth artifacts can be securely stored in an encrypted database. The entropy can be re-generated with the users email and password, which are taken as inputs on the client side and never sent from the browser. Using the ciphertext and the user's password, the entropy can be derived and used client side.
-
-#### Wallet management
-
-There are three wallet states in Hedgehog. 
-
-1. When a user has neither the entropy in local storage nor a wallet object in Hedgehog
-
-2. When a user has the entropy in local storage, but no wallet object in Hedgehog
-
-3. When a user has the entropy in local storage and a wallet object in Hedgehog
-
-For API of functions to access and modify wallet state, please see the [API](#api) section
-
-
-## Security Considerations
+## Security Considerations[TODO]
 
 - Localstorage should be audited
 - Email shouldn't be stored with auth artifacts
-
-### Code organization
