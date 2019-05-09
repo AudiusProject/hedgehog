@@ -16,7 +16,7 @@ Table of contents
 ## Installation
 Hedgehog is available as an [npm package](). 
 
-`npm install @audius/hedgehog`
+`npm install --save @audius/hedgehog`
 
 
 ## Usage
@@ -26,7 +26,7 @@ Hedgehog is available as an [npm package]().
  * hedgehogWrapper.js
  * 
  * Something similar to this file would reside in your codebase.
- * This initialize the hedgehog module and export it for the rest of your project to consume
+ * This initializes the hedgehog module and exports it for the rest of your project to consume
  */
 
 // Hedgehog is the package export that should be used by most users
@@ -79,13 +79,13 @@ module.exports = hedgehog
 
 ```js
 /**
- * This is how you actually use the hedgehog module to do authentication
- * and wallet management
+ * This is how you use the hedgehog module to do authentication
+ * and wallet management in your codebase
  */
 
 const hedgehog = require('./hedgehogWrapper')
 
-// Returning user login login flow
+// wallet management and creation/login flow
 let walletObj = null
 
 try {
@@ -95,20 +95,12 @@ try {
     if (hedgehog.walletExistsLocally()) {
       walletObj = hedgehog.restoreLocalWallet()      
     } else {
-      // Ask for email/password input
-      walletObj = await user.login(email, password)
+      // Ask for email/password input for login or signup
+
+      // walletObj = await hedgehog.login('email@domain.com', 'password')
+      // walletObj = await hedgehog.signUp('email@domain.com', 'password')
     }
   }
-}
-catch(e) {
-  throw e
-}
-
-// New user signup flow
-let walletObj
-
-try {
-  walletObj = await hedgehog.signUp('email@domain.com', 'password')
 }
 catch(e) {
   throw e
@@ -178,7 +170,7 @@ restoreLocalWallet ()
    * @returns ethereumjs-wallet wallet object
    */
 async createWalletObj (password)
-```js
+```
 
 
 ## Technical Overview
