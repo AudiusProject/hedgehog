@@ -90,13 +90,13 @@ describe('Hedgehog', async function () {
 
   it('should restore wallet from entropy stored in localStorage', async function () {
     WalletManager.setEntropyInLocalStorage(entropy)
-    let walletObj = hh.restoreLocalSession()
+    let walletObj = hh.restoreLocalWallet()
     assert.deepStrictEqual(walletObj.getAddressString(), addressStr)
   })
 
   it('should not restore wallet if no entropy stored in localStorage', async function () {
     WalletManager.deleteEntropyFromLocalStorage()
-    let walletObj = hh.restoreLocalSession()
+    let walletObj = hh.restoreLocalWallet()
     assert.deepStrictEqual(walletObj, null)
   })
 

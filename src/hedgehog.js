@@ -104,6 +104,10 @@ class Hedgehog {
     return this.wallet
   }
 
+  /**
+   * Returns if the wallet entropy exists locally.
+   * @returns {Boolean} returns true if exists, false otherwise
+   */
   walletExistsLocally () {
     let entropy = WalletManager.getEntropyFromLocalStorage()
     if (entropy) return true
@@ -116,7 +120,7 @@ class Hedgehog {
    * @returns {Object/null} If the user has a wallet client side, the wallet object is returned,
    *                        otherwise null is returned
    */
-  restoreLocalSession () {
+  restoreLocalWallet () {
     const walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
     if (walletObj) {
       this.wallet = walletObj

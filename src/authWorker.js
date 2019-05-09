@@ -25,9 +25,9 @@ module.exports = function () {
         key = new self.buffer.SlowBuffer(key)
         const keyHex = key.toString('hex')
         postMessage({ keyHex: keyHex, keyBuffer: key })
-      } else {
-        throw new Error('did not get a valid key from scrypt')
       }
+      // no else clause here, the progress triggers the else clause
+      // but there's no key yet at that point
     })
   }
 

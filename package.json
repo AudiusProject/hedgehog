@@ -38,6 +38,9 @@
       "describe",
       "it",
       "beforeEach"
+    ],
+    "ignore": [
+      "/dist/**/*.js"
     ]
   },
   "nyc": {
