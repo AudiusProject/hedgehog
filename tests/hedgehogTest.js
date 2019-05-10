@@ -56,7 +56,6 @@ describe('Hedgehog', async function () {
     } catch (e) {
       assert.deepStrictEqual(1, 1)
       assert.deepStrictEqual(hh.isLoggedIn(), false)
-      assert.deepStrictEqual(hh.walletExistsLocally(), false)
     }
   })
 
@@ -68,7 +67,6 @@ describe('Hedgehog', async function () {
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
 
     assert.deepStrictEqual(hh.isLoggedIn(), true)
-    assert.deepStrictEqual(hh.walletExistsLocally(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
   })
 
@@ -79,12 +77,10 @@ describe('Hedgehog', async function () {
     let walletObj = await hh.login(email, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
-    assert.deepStrictEqual(hh.walletExistsLocally(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
 
     hh.logout()
     assert.deepStrictEqual(hh.isLoggedIn(), false)
-    assert.deepStrictEqual(hh.walletExistsLocally(), false)
     assert.deepStrictEqual(!!hh.getWallet(), false)
   })
 
@@ -112,12 +108,10 @@ describe('Hedgehog', async function () {
   it('should create a wallet object', async function () {
     this.timeout(15000)
     assert.deepStrictEqual(hh.isLoggedIn(), false)
-    assert.deepStrictEqual(hh.walletExistsLocally(), false)
     assert.deepStrictEqual(hh.getWallet(), null)
 
     let walletObj = await hh.createWalletObj(password)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
-    assert.deepStrictEqual(hh.walletExistsLocally(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
   })
 })

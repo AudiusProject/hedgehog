@@ -6,6 +6,12 @@ class Hedgehog {
       this.getFn = getFn
       this.setFn = setFn
       this.wallet = null
+
+      // If there's entropy in localStorage, recover that and create a wallet object and put it
+      // on the wallet property in the class
+      if (WalletManager.getEntropyFromLocalStorage()) {
+        this.restoreLocalWallet()
+      }
     } else {
       throw new Error('Please pass in valid getFn and setFn parameters into the Hedgehog constructor')
     }
@@ -102,16 +108,6 @@ class Hedgehog {
    */
   getWallet () {
     return this.wallet
-  }
-
-  /**
-   * Returns if the wallet entropy exists locally.
-   * @returns {Boolean} returns true if exists, false otherwise
-   */
-  walletExistsLocally () {
-    let entropy = WalletManager.getEntropyFromLocalStorage()
-    if (entropy) return true
-    else return false
   }
 
   /**

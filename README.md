@@ -131,15 +131,12 @@ let walletObj = null
 try {
   if (hedgehog.isLoggedIn()) {
     walletObj = hedgehog.getWallet()
-  } else {
-    if (hedgehog.walletExistsLocally()) {
-      walletObj = hedgehog.restoreLocalWallet()      
-    } else {
-      // Ask for email/password input for login or signup
+  }
+  else {
+    // Ask for email/password input for login or signup
 
-      // walletObj = await hedgehog.login('email@domain.com', 'password')
-      // walletObj = await hedgehog.signUp('email@domain.com', 'password')
-    }
+    // walletObj = await hedgehog.login('email@domain.com', 'password')
+    // walletObj = await hedgehog.signUp('email@domain.com', 'password')
   }
 }
 catch(e) {
@@ -188,12 +185,6 @@ isLoggedIn ()
    * @returns {Object} ethereumjs-wallet wallet object if a wallet exists, otherwise null
    */
 getWallet ()
-
-/**
-   * Returns if the wallet entropy exists locally.
-   * @returns {Boolean} returns true if exists, false otherwise
-   */
-walletExistsLocally ()
 
 /**
    * If a user refreshes or navigates away from the page and comes back later, this attempts
