@@ -27,19 +27,9 @@ Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. 
 
 #### Wallet creation
 
-Wallets are created by first generating a wallet seed and entropy as per the BIP-39 spec. The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the BIP-32 spec. This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. This entropy can be read from localStorage when a user comes back to your app, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class available for use by any application using Hedgehog. The wallet is an object returned by the `ethereumjs-wallet` npm package.
+Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
 
 In addition to the entropy itself, Hedgehog generates auth artifacts that contain the entropy encrypted in a ciphertext along with the user's password. These auth artifacts can be securely stored in an encrypted database. The entropy can be re-generated with the users email and password, which are taken as inputs on the client side and never sent from the browser. Using the ciphertext and the user's password, the entropy can be derived and used client side.
-
-#### Wallet management
-
-There are three wallet states in Hedgehog. 
-
-1. When a user has neither the entropy in local storage nor a wallet object in Hedgehog
-
-2. When a user has the entropy in local storage, but no wallet object in Hedgehog
-
-3. When a user has the entropy in local storage and a wallet object in Hedgehog
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
 
@@ -56,7 +46,7 @@ The Hedgehog package has been organized into several files with varying degrees 
 
 All third party javascript should be audited for localStorage access. If a library accesses localStorage and extracts all keys, it could present a possible data breach
 
-Email should be stored separately from auth artifacts. The table containing the authentication values should be independent with no relation to the table storing email addresses
+Email should be stored separately from auth artifacts in different tables. The table containing the authentication values should be independent with no relation to the table storing email addresses
 
 ## Usage
 
@@ -135,8 +125,9 @@ try {
   else {
     // Ask for email/password input for login or signup
 
-    // walletObj = await hedgehog.login('email@domain.com', 'password')
-    // walletObj = await hedgehog.signUp('email@domain.com', 'password')
+    walletObj = await hedgehog.login('email@domain.com', 'password')
+    // or
+    walletObj = await hedgehog.signUp('email@domain.com', 'password')
   }
 }
 catch(e) {
