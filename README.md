@@ -7,10 +7,10 @@ Table of contents
 <!--ts-->
    * [Installation](#installation)
    * [Technical Overview](#technical-overview)
-   * * [Wallet creation](#wallet-creation)
-   * * [Wallet management](#wallet-management)
-   * * [Code Organization](#code-organization)
-   * * [Security Considerations](#security-considerations)
+     * [Wallet creation](#wallet-creation)
+     * [Wallet management](#wallet-management)
+     * [Code Organization](#code-organization)
+     * [Security Considerations](#security-considerations)
    * [Usage](#usage)
    * [API](#api)
 <!--te-->
