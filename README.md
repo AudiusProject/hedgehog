@@ -1,5 +1,6 @@
 # Hedgehog
-A drop-in alternative for Metamask to manage a user's private key and wallet locally on the browser. This module is intended as a full service tool with minimal setup and configuration. 
+A drop-in alternative for Metamask to manage a user's private key and wallet locally on the browser by providing users with a familiar sign up and login authentication scheme. Hedgehog abstracts away all the logic necessary to securely persist and retrieve auth artifacts to the backend of your choice and also performs all encryption and decryption necessary to manage user private keys along the way.
+
 
 Table of contents
 =================
@@ -31,7 +32,7 @@ Wallets are created by first generating a wallet seed and entropy as per the [BI
 
 In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `ciphertext`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `ciphertext` and `iv` values. The `ciphertext` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using scrypt and stores the entropy. 
 
-Since entropy is stored in the `ciphertext`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localSTorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
+Since entropy is stored in the `ciphertext`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localStorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
 
@@ -41,12 +42,12 @@ The Hedgehog package has been organized into several files with varying degrees 
 
 * <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
 * <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
-* <b>src/walletManager.js</b> - wallet management logic including localstorage, and end to end authentication functionality
+* <b>src/walletManager.js</b> - wallet management logic including localStorage, and end to end authentication functionality
 * <b>src/authentication.js</b> - low level authentication functions (eg create iv, encrypt hash etc)
 
 #### Security Considerations
 
-All third party javascript should be audited for localStorage access. One possible attack vector is that a script loops through all localStorage keys and sends them to a third party server from where those keys could be used to sign transactions on behalf of malicious actors. To mitigate this, all third party javascript should be audited and stored locally to serve, instead of being loaded dynamically through scripts.
+All third party javascript should be audited for localStorage access. One possible attack vector is a script that loops through all localStorage keys and sends them to a third party server from where those keys could be used to sign transactions on behalf of malicious actors. To mitigate this, all third party javascript should be audited and stored locally to serve, instead of being loaded dynamically through scripts.
 
 Email should be stored separately from auth artifacts in different tables. The table containing the authentication values should be independent with no relation to the table storing email addresses
 
@@ -112,7 +113,9 @@ module.exports = hedgehog
 ```js
 /**
  * This is how you use the hedgehog module to do authentication
- * and wallet management in your codebase
+ * and wallet management in your codebase.
+ * 
+ * The import is from the hedgehogWrapper.js code snippet above
  */
 
 const hedgehog = require('./hedgehogWrapper')
