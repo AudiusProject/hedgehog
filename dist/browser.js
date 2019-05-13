@@ -29614,7 +29614,6 @@ module.exports = function () {
     const p = 1
     const dkLen = 32
 
-    debugger
     self.scrypt(passwordBuffer, ivBuffer, N, r, p, dkLen, function (error, progress, key) {
       if (error) {
         throw error
@@ -29623,6 +29622,8 @@ module.exports = function () {
         const keyHex = key.toString('hex')
         postMessage({ keyHex: keyHex, keyBuffer: key })
       }
+      // no else clause here, the progress triggers the else clause
+      // but there's no key yet at that point
     })
   }
 
@@ -29833,6 +29834,12 @@ class Hedgehog {
       this.getFn = getFn
       this.setFn = setFn
       this.wallet = null
+
+      // If there's entropy in localStorage, recover that and create a wallet object and put it
+      // on the wallet property in the class
+      if (WalletManager.getEntropyFromLocalStorage()) {
+        this.restoreLocalWallet()
+      }
     } else {
       throw new Error('Please pass in valid getFn and setFn parameters into the Hedgehog constructor')
     }
@@ -29843,7 +29850,7 @@ class Hedgehog {
    * call setFn to persist the artifacts to a server and return the wallet object
    * @param {String} email user email address
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
   async signUp (email, password) {
     // TODO (DM) - check that wallet doesn't already exist
@@ -29880,7 +29887,7 @@ class Hedgehog {
    * getFn, create the private key using the artifacts and the user password
    * @param {String} email user email address
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
   async login (email, password) {
     let self = this
@@ -29925,20 +29932,10 @@ class Hedgehog {
 
   /**
    * Returns the current user wallet
-   * @returns ethereumjs-wallet wallet object if a wallet exists, otherwise null
+   * @returns {Object} ethereumjs-wallet wallet object if a wallet exists, otherwise null
    */
   getWallet () {
     return this.wallet
-  }
-
-  /**
-   * Returns if the wallet entropy exists locally.
-   * @returns {Boolean} returns true if exists, false otherwise
-   */
-  walletExistsLocally () {
-    let entropy = WalletManager.getEntropyFromLocalStorage()
-    if (entropy) return true
-    else return false
   }
 
   /**
@@ -29959,7 +29956,7 @@ class Hedgehog {
    * Create a new client side wallet object without going through the signup flow. This is useful
    * if you need a temporary, read-only wallet that is ephemeral and does not need to be persisted
    * @param {String} password user password
-   * @returns ethereumjs-wallet wallet object
+   * @returns {Object} ethereumjs-wallet wallet object
    */
   async createWalletObj (password) {
     if (password) {
