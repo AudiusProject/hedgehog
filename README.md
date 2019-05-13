@@ -1,6 +1,7 @@
 # Hedgehog
-A drop-in alternative for Metamask to manage a user's private key and wallet locally on the browser by providing users with a familiar sign up and login authentication scheme. Hedgehog abstracts away all the logic necessary to securely persist and retrieve auth artifacts to the backend of your choice and also performs all encryption and decryption necessary to manage user private keys along the way.
+A drop-in alternative for Metamask that allows you to to manage a user's private key and wallet on the browser as well as a way to securely encrypt and persist, decrypt and retrieve the auth artifacts necessary to derive the private key. These auth artifacts can be stored in any database and server of your choice. Hedgehog exposes an API for a very familiar authentication scheme with sign up and login functions while also abstracting away all the logic necessary interact with these auth artifacts. It also performs all encryption and decryption necessary to create and manage user private keys along the way.
 
+For more in depth explanations and examples, please read the [Technical Overview](#technical-overview) and [Usage](#usage) sections.
 
 Table of contents
 =================
