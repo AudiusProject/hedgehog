@@ -29,7 +29,9 @@ Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. 
 
 Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
 
-In addition to the entropy itself, Hedgehog generates auth artifacts that contain the entropy encrypted in a ciphertext along with the user's password. These auth artifacts can be securely stored in an encrypted database. The entropy can be re-generated with the users email and password, which are taken as inputs on the client side and never sent from the browser. Using the ciphertext and the user's password, the entropy can be derived and used client side.
+In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `ciphertext`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `ciphertext` and `iv` values. The `ciphertext` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using scrypt and stores the entropy. 
+
+Since entropy is stored in the `ciphertext`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localSTorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
 
@@ -44,7 +46,7 @@ The Hedgehog package has been organized into several files with varying degrees 
 
 #### Security Considerations
 
-All third party javascript should be audited for localStorage access. If a library accesses localStorage and extracts all keys, it could present a possible data breach
+All third party javascript should be audited for localStorage access. One possible attack vector is that a script loops through all localStorage keys and sends them to a third party server from where those keys could be used to sign transactions on behalf of malicious actors. To mitigate this, all third party javascript should be audited and stored locally to serve, instead of being loaded dynamically through scripts.
 
 Email should be stored separately from auth artifacts in different tables. The table containing the authentication values should be independent with no relation to the table storing email addresses
 
