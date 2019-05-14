@@ -13,6 +13,10 @@ Table of contents
      * [Wallet management](#wallet-management)
      * [Code Organization](#code-organization)
      * [Security Considerations](#security-considerations)
+     * [Lost Password Consideration](#lost-password-consideration)
+   * [Funding Hedgehog Accounts](#funding-hedgehog-accounts)
+     * [Fund User Wallets](#fund-user-wallets)
+     * [EIP-712 Relay Transactions](#eip-712-relay-transactions)
    * [Usage](#usage)
    * [API](#api)
 <!--te-->
@@ -27,7 +31,7 @@ Hedgehog is available as an [npm package]().
 
 Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
 
-#### Wallet creation
+#### Wallet Creation
 
 Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
 
@@ -36,6 +40,28 @@ In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `
 Since entropy is stored in the `ciphertext`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localStorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
+
+#### Wallet Persistence
+
+The wallet information can be persisted on the backend of your choice. You as the developer have the choice to pick which language and frameworks to use, write the endpoints to suit any custom logic necessary and selecting a hosting provider (if any). 
+
+The database schema for persisting data should resemble the follow. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a rainbow table attack could increase because the password is the only unknown property.
+
+The values and explanation for fields in the Authentications table (`iv`, `cipherText` and `lookupKey`) are given in the [Wallet creation](#wallet-creation) section
+
+
+##### Authentications
+| Column
+| ------------- 
+| iv
+| cipherText
+| lookupKey
+
+##### Users
+| Column        
+| ------------- 
+| email (optional)
+| ownerWallet
 
 #### Code Organization
 
@@ -52,7 +78,29 @@ All third party javascript should be audited for localStorage access. One possib
 
 Email should be stored separately from auth artifacts in different tables. The table containing the authentication values should be independent with no relation to the table storing email addresses
 
-## Usage
+#### Lost Password Consideration
+
+If a user loses their password, the account is no longer recoverable. There's no way to reset a password because the entropy is encrypted client side before it's sent to the database. And since the old password is required to decrypt the entropy and re-encrypt with a new password, if the password used to encrypt the entropy has been lost or forgotten, the account is not recoverable. 
+
+## Funding Hedgehog Accounts
+
+Since Hedgehog creates and manages wallets client side, just like Metamask, there problem of funding a wallet still exists. When performing only reads from a blockchain, there's usually no transaction fees. However, write transactions typically require fees, and the onus is on the transaction sender to pay these fees. If you're making a product for end users, this might not be ideal since your users will be the ones required to pay to submit transactions, and without much of a technology or cryptocurrency background, it could be challenging for end users to self-fund their wallets. 
+
+There are two ways to try to solve this problem: fund user wallets or use EIP-712 relay transactions.
+
+#### Fund User Wallets
+
+As part of the endpoint which persists the ownerWallet, you can fund any new `ownerWallet`'s created. When a new wallet is created, you could send a small amount of tokens to that address so the user can sign and send transactions to the chain browser side. The downside is there could be potential for abuse where someone farms accounts to collect tokens because these accounts would be funded directly. 
+
+#### EIP-712 Relay Transactions
+
+Another option is to have users sign their transactions browser side, but relay their transaction through an EIP-712 relayer which would actually submit their transaction to chain. This means any transaction costs incurred would be paid by the relayer instead of the user, however the original user transaction data is preserved and submitted.
+
+For more information about EIP-712, please see the following links:
+https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
+https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb92fd1a7a26
+
+## Usage Example
 
 The code below shows a simple wrapper to integrate Hedgehog into your own application. For a fully working end-to-end example, please see the Codepen demo [here](http://www.google.com)
 ```js
@@ -87,9 +135,11 @@ const makeRequestToService = async (axiosRequestObj) => {
   }
 }
 
-// The Hedgehog constructor takes in two functions, a `setFn` and a `getFn`. 
-// Each one of these will be called in the appropriate places to write to
-// or read from a data store
+
+/**
+ * The setFn is the endpoint used to send data to the backend of your choice to persist user and authentication information
+ * @param {Object} obj contains {iv, cipherText, lookupKey, ownerWallet, email}
+ */
 const setFn = async (obj) => {
   await makeRequestToService({
     url: '/authentication/sign_up',
@@ -97,6 +147,11 @@ const setFn = async (obj) => {
     data: obj
   })
 }
+
+/**
+ * The getFn is the endpoint used to retrieve authentication data from the backend of your choice
+ * @param {Object} obj contains {iv, cipherText, lookupKey}
+ */
 const getFn = async (obj) => {
   return makeRequestToService({
     url: '/authentication/login',
@@ -105,6 +160,8 @@ const getFn = async (obj) => {
   })
 }
 
+// The Hedgehog constructor takes in two functions, a `setFn` and a `getFn`.
+// Each function is defined above
 const hedgehog = new Hedgehog(getFn, setFn)
 
 module.exports = hedgehog
