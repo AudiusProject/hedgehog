@@ -31,6 +31,9 @@ Hedgehog is available as an [npm package]().
 
 Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
 
+![Semantic description of image](./assets/HedgehogDrawing.svg "Image Title")
+
+
 #### Wallet Creation
 
 Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
