@@ -49,17 +49,19 @@ For API of functions to access and modify wallet state, please see the [API](#ap
 
 The wallet information can be persisted on the backend of your choice. You as the developer have the choice to pick which language and frameworks to use, write the endpoints to suit any custom logic necessary and selecting a hosting provider (if any). 
 
-The database schema for persisting data should resemble the follow. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a rainbow table attack could increase because the password is the only unknown property.
+The database schema for persisting data should resemble the following example. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a rainbow table attack could increase because the password is the only unknown property. These tables can be named anything since Hedgehog only interacts with REST API endpoints that will perform CRUD on these tables.
 
-The values and explanation for fields in the Authentications table (`iv`, `cipherText` and `lookupKey`) are given in the [Wallet creation](#wallet-creation) section
 
 
 ##### Authentications
 | iv | cipherText | lookupKey |
 | - | - | - |
-| c9b33e09ab96a3e64098c1bdee179f48 | 059f793b5608aa97c047e3ee50e67acb59af2e8c36d1bdf9d368781432badc273e82c04c04ceb9864c94e0911b6f7dc6e846c597d491d3745aa63d8dfde3e561 | 0e29bd2a1caba0c432ff9c8e48adc04910e3d9ee491b2a9caf3664e74656e2a8 |
-| d67a69264153621e1664d5584abca355 | 059f793b5608aa97c047e3ee50e67acb59af2e8c36d1bdf9d368781432badc273e82c04c04ceb9864c94e0911b6f7dc6e846c597d491d3745aa63d8dfde3e561 | 15e378517d7e30a04048b95c19c5857a4dc6a191416658070ff496ec9251e3c0 |
-| 99a410c5ecff7d52835a3f615fa6536e | f4ce3e967787b55b6f5269f1f0a2fb78005968955b4d3d46ec1825b5fe6a57a71e8c1e5ed815d02b8a9ea913a3a59519608cd2a3721658d885e96165fe39df07 | 18700382eb499502cf7b9dfcac8ae80e585905bf62070873c0729329c53c4110 |
+| c9b3...48 | 07...e561 | 0e...2a8 |
+| d6...355 | 059f...561 | 15e...3c0 |
+| 99...6e | f4...07 | 18...10 |
+
+The values and explanation for fields in the Authentications table (`iv`, `cipherText` and `lookupKey`) are given in the [Wallet creation](#wallet-creation) section
+
 
 ##### Users
 | email | ownerWallet |        
