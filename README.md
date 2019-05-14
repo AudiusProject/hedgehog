@@ -65,7 +65,7 @@ The values and explanation for fields in the Authentications table (`iv`, `ciphe
 
 #### Code Organization
 
-The Hedgehog package is been organized into several files with varying degrees of control.
+The Hedgehog package is organized into several files with varying levels of control.
 
 * <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
 * <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
