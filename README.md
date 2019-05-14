@@ -35,9 +35,9 @@ Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. 
 
 Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
 
-In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `ciphertext`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `ciphertext` and `iv` values. The `ciphertext` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using scrypt and stores the entropy. 
+In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `cipherText`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `cipherText` and `iv` values. The `cipherText` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using scrypt and stores the entropy. 
 
-Since entropy is stored in the `ciphertext`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localStorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
+Since entropy is stored in the `cipherText`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localStorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
 
 For API of functions to access and modify wallet state, please see the [API](#api) section
 
@@ -51,17 +51,17 @@ The values and explanation for fields in the Authentications table (`iv`, `ciphe
 
 
 ##### Authentications
-| Column
-| ------------- 
-| iv
-| cipherText
-| lookupKey
+| iv | cipherText | lookupKey |
+| - | - | - |
+| c9b33e09ab96a3e64098c1bdee179f48 | 059f793b5608aa97c047e3ee50e67acb59af2e8c36d1bdf9d368781432badc273e82c04c04ceb9864c94e0911b6f7dc6e846c597d491d3745aa63d8dfde3e561 | 0e29bd2a1caba0c432ff9c8e48adc04910e3d9ee491b2a9caf3664e74656e2a8 |
+| d67a69264153621e1664d5584abca355 | 059f793b5608aa97c047e3ee50e67acb59af2e8c36d1bdf9d368781432badc273e82c04c04ceb9864c94e0911b6f7dc6e846c597d491d3745aa63d8dfde3e561 | 15e378517d7e30a04048b95c19c5857a4dc6a191416658070ff496ec9251e3c0 |
+| 99a410c5ecff7d52835a3f615fa6536e | f4ce3e967787b55b6f5269f1f0a2fb78005968955b4d3d46ec1825b5fe6a57a71e8c1e5ed815d02b8a9ea913a3a59519608cd2a3721658d885e96165fe39df07 | 18700382eb499502cf7b9dfcac8ae80e585905bf62070873c0729329c53c4110 |
 
 ##### Users
-| Column        
-| ------------- 
-| email (optional)
-| ownerWallet
+| email | ownerWallet |        
+| - | - |
+| email1^@hedgehogtest.com | 0xad7a4b1c64a10ebf7f4995bc88fcbf1749c72611 |
+| seconde*mail@hedgehogtest.com | 0x2b88420100514fbd8a48c3c427c6251335bcd8d0 |
 
 #### Code Organization
 
@@ -102,7 +102,7 @@ https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb
 
 ## Usage Example
 
-The code below shows a simple wrapper to integrate Hedgehog into your own application. For a fully working end-to-end example, please see the Codepen demo [here](http://www.google.com)
+The code below shows a simple wrapper to integrate Hedgehog into your own application. For a fully working end-to-end demo with a backend hosted on Firebase, click [here](https://codesandbox.io/embed/pp9zzv2n00)
 ```js
 /**
  * hedgehogWrapper.js
