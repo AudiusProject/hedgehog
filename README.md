@@ -10,7 +10,7 @@ Table of contents
    * [Installation](#installation)
    * [Technical Overview](#technical-overview)
      * [Wallet creation](#wallet-creation)
-     * [Wallet management](#wallet-management)
+     * [Wallet Persistence](#wallet-persistence)
      * [Code Organization](#code-organization)
      * [Security Considerations](#security-considerations)
      * [Lost Password Consideration](#lost-password-consideration)
