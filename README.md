@@ -37,7 +37,7 @@ Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. 
 
 #### Wallet Creation
 
-Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage#Browser_compatibility) to allow user state to persist across multiple sessions without any external dependency. Using this entropy, a wallet object from `ethereumjs-wallet` is generated and stored in the `wallet` property within the Hedgehog class on initialization, enabling state persistence.
+Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can then be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage#Browser_compatibility) to allow user state to persist across multiple sessions without any external dependency. Using this entropy, a wallet object from `ethereumjs-wallet` is generated and stored in the `wallet` property within the Hedgehog class on initialization, enabling state persistence.
 
 In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `cipherText`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `cipherText` and `iv` values. The `cipherText` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using [scrypt](https://en.wikipedia.org/wiki/Scrypt) and stores the entropy. 
 
@@ -112,15 +112,9 @@ https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb
 
 ## Usage Example
 
-The code below shows a simple wrapper to integrate Hedgehog into your own application. For a fully working end-to-end demo with a backend hosted on Firebase, click [here](https://codesandbox.io/embed/pp9zzv2n00)
-```js
-/**
- * hedgehogWrapper.js
- * 
- * Something similar to this file would reside in your codebase.
- * This initializes the hedgehog module and exports it for the rest of your project to consume
- */
+The code below shows code snippets to integrate Hedgehog into your own application. For a fully working end-to-end demo with a backend hosted on Firebase, click [here](https://codesandbox.io/embed/pp9zzv2n00)
 
+```js
 // Hedgehog is the package export that should be used by most users
 // WalletManager and Authentication imports are possible but not recommended
 // and should only be used by advanced users
@@ -147,12 +141,24 @@ const makeRequestToService = async (axiosRequestObj) => {
 
 
 /**
- * The setFn is the endpoint used to send data to the backend of your choice to persist user and authentication information
+ * The setAuthFn is the endpoint used to send auth data to the backend of your choice 
  * @param {Object} obj contains {iv, cipherText, lookupKey, ownerWallet, email}
  */
-const setFn = async (obj) => {
+const setAuthFn = async (obj) => {
   await makeRequestToService({
-    url: '/authentication/sign_up',
+    url: '/authentication',
+    method: 'post',
+    data: obj
+  })
+}
+
+/**
+ * The setUserFn is the endpoint used to send user data to the backend of your choice 
+ * @param {Object} obj contains {ownerWallet, email}
+ */
+const setUserFn = async (obj) => {
+  await makeRequestToService({
+    url: '/user',
     method: 'post',
     data: obj
   })
@@ -160,7 +166,7 @@ const setFn = async (obj) => {
 
 /**
  * The getFn is the endpoint used to retrieve authentication data from the backend of your choice
- * @param {Object} obj contains {iv, cipherText, lookupKey}
+ * @param {Object} obj contains {lookupKey}
  */
 const getFn = async (obj) => {
   return makeRequestToService({
@@ -170,25 +176,12 @@ const getFn = async (obj) => {
   })
 }
 
-// The Hedgehog constructor takes in two functions, a `setFn` and a `getFn`.
+// The Hedgehog constructor takes in three functions
+// setAuthFn, setUserFn and getFn.
 // Each function is defined above
-const hedgehog = new Hedgehog(getFn, setFn)
+const hedgehog = new Hedgehog(getFn, setAuthFn, setUserFn)
 
-module.exports = hedgehog
-
-```
-
-```js
-/**
- * This is how you use the hedgehog module to do authentication
- * and wallet management in your codebase.
- * 
- * The import is from the hedgehogWrapper.js code snippet above
- */
-
-const hedgehog = require('./hedgehogWrapper')
-
-// wallet management and creation/login flow
+// walletObj is an `ethereumjs-wallet` object that can be used to sign transactions
 let walletObj = null
 
 try {

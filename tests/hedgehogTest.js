@@ -10,9 +10,14 @@ const getFn = (obj) => {
   if (obj && data && obj.lookupKey === data.lookupKey && obj.email === data.email) return data
   else return null
 }
-const setFn = (obj) => {
+const setAuthFn = (obj) => {
   data = obj
 }
+
+const setUserFn = (obj) => {
+  data = obj
+}
+
 const resetDataInDB = () => {
   data = null
 }
@@ -32,7 +37,7 @@ const authArtifacts = {
 beforeEach(function () {
   // brand new hedgehog instance before each test block
   // also clears entropy from local storage so there is no wallet or localStorage state between tests
-  hh = new Hedgehog(getFn, setFn)
+  hh = new Hedgehog(getFn, setAuthFn, setUserFn)
   WalletManager.deleteEntropyFromLocalStorage()
 })
 
@@ -40,7 +45,7 @@ describe('Hedgehog', async function () {
   it('should fail with incorrect constructor arguments', async function () {
     try {
       Hedgehog()
-      assert.fail('Should not be allowed to create Hedgehog object without setFn and getFn args')
+      assert.fail('Should not be allowed to create Hedgehog object without setAuthFn, setUserFn and getFn args')
     } catch (e) {
       assert.deepStrictEqual(1, 1)
     }

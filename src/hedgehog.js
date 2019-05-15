@@ -1,10 +1,11 @@
 const WalletManager = require('./walletManager')
 
 class Hedgehog {
-  constructor (getFn, setFn) {
-    if (getFn && setFn) {
+  constructor (getFn, setAuthFn, setUserFn) {
+    if (getFn && setAuthFn && setUserFn) {
       this.getFn = getFn
-      this.setFn = setFn
+      this.setAuthFn = setAuthFn
+      this.setUserFn = setUserFn
       this.wallet = null
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
@@ -37,19 +38,27 @@ class Hedgehog {
       const { ivHex, cipherTextHex, walletObj } = result[0]
       const lookupKey = result[1]
 
-      self.wallet = walletObj
       const walletAddress = walletObj.getAddressString()
 
-      const data = {
+      const authData = {
         iv: ivHex,
         cipherText: cipherTextHex,
-        lookupKey: lookupKey,
+        lookupKey: lookupKey
+      }
+
+      const userData = {
         email: email,
         ownerWallet: walletAddress
       }
-      await self.setFn(data)
+      await self.setUserFn(userData)
+      await self.setAuthFn(authData)
+
+      // set the wallet at the very end to make sure the isLoggedIn() function doesn't return true
+      self.wallet = walletObj
+
       return walletObj
     } catch (e) {
+      self.logout()
       throw e
     }
   }
@@ -64,7 +73,7 @@ class Hedgehog {
   async login (email, password) {
     let self = this
     let lookupKey = await WalletManager.createAuthLookupKey(email, password)
-    let data = await self.getFn({ lookupKey: lookupKey, email: email })
+    let data = await self.getFn({ lookupKey: lookupKey })
 
     if (data && data.iv && data.cipherText) {
       const { walletObj, entropy } = await WalletManager.decryptCipherTextAndRetrieveWallet(
