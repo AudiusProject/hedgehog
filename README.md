@@ -33,13 +33,13 @@ Hedgehog is available as an [npm package]().
 
 Hedgehog is a package that lives in your front end application to create and manage a user's entropy (from which a private key is derived) and interact with a REST API on a server and database of your choice to securely persist and retrieve auth artifacts. Hedgehog relies on user email and password to create auth artifacts, so it's able to simulate a familiar authentication system that allows users to sign up or login from multiple browsers or devices and retrieve their entropy. Since Hedgehog interacts with a REST API, it requires that you run a server or database, or use a managed solution, and conform to the API specified in the [Usage Example](#usage-example) section below. It also performs all cryptography necessary to create, secure and manage user private keys and wallets along the way.
 
-Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and can be retrieved with a hash computed with email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
+Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and retrieved with a hash computed from email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
 
 #### Wallet Creation
 
-Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's localStorage to allow users access across multiple sessions without any server side backing. If a user was previously logged in and returns to your app, this entropy can be read from localStorage, and a wallet can be generated and stored in the `wallet` property on the Hedgehog class. The wallet is an object returned by the `ethereumjs-wallet` npm package.
+Wallets are created by first generating a wallet seed and entropy as per the [BIP-39 spec](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). The entropy can them be used to derive a hierarchical deterministic wallet given a path, as stated in the [BIP-32 spec](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). This entropy is stored in the browser's [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage#Browser_compatibility) to allow user state to persist across multiple sessions without any external dependency. Using this entropy, a wallet object from `ethereumjs-wallet` is generated and stored in the `wallet` property within the Hedgehog class on initialization, enabling state persistence.
 
-In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `cipherText`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `cipherText` and `iv` values. The `cipherText` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using scrypt and stores the entropy. 
+In addition to the entropy, Hedgehog generates an initialization vector(`iv`), `lookupKey` and `cipherText`. These three values can be securely stored in a database and retrieved from a server to authenticate a user. The `iv` is a random hex string generated for each user to secure authentication. The `lookupKey` is the email and password combined with a pre-defined, constant, initialization vector(not the same `iv` that's stored in the database). This `lookupKey` acts as the primary key in the database to retrieve the `cipherText` and `iv` values. The `cipherText` is generated using an aes-256-cbc cipher with the `iv` and a key derived from a combination of the user's password and the iv using [scrypt](https://en.wikipedia.org/wiki/Scrypt) and stores the entropy. 
 
 Since entropy is stored in the `cipherText`, it can be derived from there if we know the `iv` and key(scrypt of user's password and `iv`). After the entropy is decrypted, it's stored in the browser on a local `ethereumjs-wallet` object as well as in localStorage. The encryption and decryption process happens exclusively on the client side with the user's password or entropy never leaving the browser without first being encrypted.
 
@@ -49,7 +49,7 @@ For API of functions to access and modify wallet state, please see the [API](#ap
 
 The wallet information can be persisted on the backend of your choice. You as the developer have the choice to pick which language and frameworks to use, write the endpoints to suit any custom logic necessary and selecting a hosting provider (if any). 
 
-The database schema for persisting data should resemble the following example. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a rainbow table attack could increase because the password is the only unknown property. These tables can be named anything since Hedgehog only interacts with REST API endpoints that will perform CRUD on these tables.
+The database schema for persisting data should resemble the following example. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a [rainbow table attack](https://en.wikipedia.org/wiki/Rainbow_table) could increase because the password is the only unknown property. These tables can be named anything since Hedgehog only interacts with REST API endpoints that will perform CRUD on these tables.
 
 
 
@@ -71,7 +71,7 @@ The values and explanation for fields in the Authentications table (`iv`, `ciphe
 
 #### Code Organization
 
-The Hedgehog package has been organized into several files with varying degrees of control.
+The Hedgehog package is organized into several files with varying levels of control.
 
 * <b>index.js</b> - default exports for the npm module, exports each of the src/ modules below
 * <b>src/hedgehog.js</b> -  main constructor with primary consumable public facing API and high level functions
@@ -84,13 +84,15 @@ All third party javascript should be audited for localStorage access. One possib
 
 Email should be stored separately from auth artifacts in different tables. The table containing the authentication values should be independent with no relation to the table storing email addresses
 
-#### Lost Password Consideration
+#### Lost Password WARNING
 
 If a user loses their password, the account is no longer recoverable. There's no way to reset a password because the entropy is encrypted client side before it's sent to the database. And since the old password is required to decrypt the entropy and re-encrypt with a new password, if the password used to encrypt the entropy has been lost or forgotten, the account is not recoverable. 
 
 ## Funding Hedgehog Accounts
 
-Since Hedgehog creates and manages wallets client side, just like Metamask, there problem of funding a wallet still exists. When performing only reads from a blockchain, there's usually no transaction fees. However, write transactions typically require fees, and the onus is on the transaction sender to pay these fees. If you're making a product for end users, this might not be ideal since your users will be the ones required to pay to submit transactions, and without much of a technology or cryptocurrency background, it could be challenging for end users to self-fund their wallets. 
+Since Hedgehog creates and manages wallets client side, just like Metamask, the problem of funding a wallet still exists. When performing only reads from a blockchain, there's usually no transaction fees. However, write transactions typically require fees, and the onus is on the transaction sender to pay these fees. 
+
+This is less than ideal for an end user facing product since users will be required to pay when submitting transactions - without a technology or cryptocurrency background, self-funding wallets is an unrealistic requirement.
 
 There are two ways to try to solve this problem: fund user wallets or use EIP-712 relay transactions.
 
@@ -100,10 +102,12 @@ As part of the endpoint which persists the ownerWallet, you can fund any new `ow
 
 #### EIP-712 Relay Transactions
 
-Another option is to have users sign their transactions browser side, but relay their transaction through an EIP-712 relayer which would actually submit their transaction to chain. This means any transaction costs incurred would be paid by the relayer instead of the user, however the original user transaction data is preserved and submitted.
+Another option is to have users sign their transactions browser side, but relay their transaction through an EIP-712 relayer which submits their transaction to chain. Any transaction costs incurred would be paid by the relayer instead of the user, however the original user transaction data is preserved and submitted.
 
 For more information about EIP-712, please see the following links:
+
 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
+
 https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb92fd1a7a26
 
 ## Usage Example
