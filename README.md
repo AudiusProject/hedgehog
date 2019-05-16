@@ -1,7 +1,7 @@
 # Hedgehog
 An alternative for Metamask that manages a user's private key and wallet on the browser and exposes an API to allow you to create an authentication scheme to let users sign up and login to their wallet across multiple browsers and devices.
 
-For more in depth explanations and examples, please read the [Overview](#overview) and [Usage](#usage) sections.
+For more in depth explanations and examples, please read the [Overview](#overview) and [Example Usage](#example-usage) sections.
 
 Table of contents
 =================
@@ -13,11 +13,11 @@ Table of contents
      * [Wallet Persistence](#wallet-persistence)
      * [Code Organization](#code-organization)
      * [Security Considerations](#security-considerations)
-     * [Lost Password Consideration](#lost-password-consideration)
+     * [Lost Password WARNING](#lost-password-warning)
    * [Funding Hedgehog Accounts](#funding-hedgehog-accounts)
      * [Fund User Wallets](#fund-user-wallets)
      * [EIP-712 Relay Transactions](#eip-712-relay-transactions)
-   * [Usage Example](#usage-example)
+   * [Example Usage](#example-usage)
    * [API](#api)
 <!--te-->
 
@@ -31,7 +31,7 @@ Hedgehog is available as an [npm package]().
 
 ![Semantic description of image](./assets/HedgehogDrawing.svg "Image Title")
 
-Hedgehog is a package that lives in your front end application to create and manage a user's entropy (from which a private key is derived) and interact with a REST API on a server and database of your choice to securely persist and retrieve auth artifacts. Hedgehog relies on user email and password to create auth artifacts, so it's able to simulate a familiar authentication system that allows users to sign up or login from multiple browsers or devices and retrieve their entropy. Since Hedgehog interacts with a REST API, it requires that you run a server or database, or use a managed solution, and conform to the API specified in the [Usage Example](#usage-example) section below. It also performs all cryptography necessary to create, secure and manage user private keys and wallets along the way.
+Hedgehog is a package that lives in your front end application to create and manage a user's entropy (from which a private key is derived) and interact with a REST API on a server and database of your choice to securely persist and retrieve auth artifacts. Hedgehog relies on user email and password to create auth artifacts, so it's able to simulate a familiar authentication system that allows users to sign up or login from multiple browsers or devices and retrieve their entropy. Since Hedgehog interacts with a REST API, it requires that you run a server or database, or use a managed solution, and conform to the API specified in the [Example Usage](#example-usage) section below. It also performs all cryptography necessary to create, secure and manage user private keys and wallets along the way.
 
 Hedgehog generates a set of artifacts similar to a MyEtherWallet keystore file. Those artifacts can then be persisted to a database of your choice and retrieved with a hash computed from email address, password and an initialization vector. The private key is only computed and available client side and is never transmitted or stored anywhere besides the user's browser.
 
@@ -110,7 +110,7 @@ https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
 
 https://medium.com/metamask/eip712-is-coming-what-to-expect-and-how-to-use-it-bb92fd1a7a26
 
-## Usage Example
+## Example Usage
 
 The code below shows code snippets to integrate Hedgehog into your own application. For a fully working end-to-end demo with a backend hosted on Firebase, click [here](https://codesandbox.io/embed/pp9zzv2n00)
 

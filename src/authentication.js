@@ -95,7 +95,6 @@ class Authentication {
             reject(err)
           } else {
             const keyHex = derivedKey.toString('hex')
-            console.log('keyHex', derivedKey, keyHex)
 
             // This is the private key
             let keyBuffer = Utils.bufferFromHexString(keyHex)
