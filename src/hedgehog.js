@@ -14,7 +14,7 @@ class Hedgehog {
         this.restoreLocalWallet()
       }
     } else {
-      throw new Error('Please pass in valid getFn and setFn parameters into the Hedgehog constructor')
+      throw new Error('Please pass in valid getFn, setAuthFn and setUserFn parameters into the Hedgehog constructor')
     }
   }
 
