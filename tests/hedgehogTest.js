@@ -2,35 +2,42 @@ const assert = require('assert')
 const { Hedgehog, WalletManager } = require('../index')
 const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, email } = require('./helpers')
 
-var hh = null
-var data = null
+let hh = null
+let authData = null
+let userData = null
 
 // Makeshift DB logic
 const getFn = (obj) => {
-  if (obj && data && obj.lookupKey === data.lookupKey && obj.email === data.email) return data
+  if (obj && authData && userData && obj.lookupKey === authData.lookupKey) return authData
   else return null
 }
 const setAuthFn = (obj) => {
-  data = obj
+  authData = obj
 }
 
 const setUserFn = (obj) => {
-  data = obj
+  userData = obj
 }
 
 const resetDataInDB = () => {
-  data = null
+  authData = null
+  userData = null
 }
-const setDataInDB = (d) => {
-  data = d
+const setDataInDB = (auth, user) => {
+  authData = auth
+  userData = user
 }
 
 // email is `email@address.com`, password is `testpassword`
-const authArtifacts = {
+const authValues = {
   iv: ivHex,
   cipherText: cipherTextHex,
+  lookupKey
+
+}
+
+const userValues = {
   ownerWallet: addressStr,
-  lookupKey,
   email
 }
 
@@ -77,7 +84,7 @@ describe('Hedgehog', async function () {
 
   it('should logout after logging in', async function () {
     this.timeout(15000)
-    setDataInDB(authArtifacts)
+    setDataInDB(authValues, userValues)
 
     let walletObj = await hh.login(email, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
