@@ -37,7 +37,7 @@ const authValues = {
 }
 
 const userValues = {
-  ownerWallet: addressStr,
+  walletAddress: addressStr,
   email
 }
 

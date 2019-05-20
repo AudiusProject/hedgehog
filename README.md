@@ -49,7 +49,7 @@ For API of functions to access and modify wallet state, please see the [API](#ap
 
 The wallet information can be persisted on the backend of your choice. You as the developer have the choice to pick which language and frameworks to use, write the endpoints to suit any custom logic necessary and selecting a hosting provider (if any). 
 
-The database schema for persisting data should resemble the following example. There two tables, one for storing authentication information, and the other for storing email and ownerWallet. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a [rainbow table attack](https://en.wikipedia.org/wiki/Rainbow_table) could increase because the password is the only unknown property. These tables can be named anything since Hedgehog only interacts with REST API endpoints that will perform CRUD on these tables.
+The database schema for persisting data should resemble the following example. There two tables, one for storing authentication information, and the other for storing email and walletAddress. It's important that the email is not stored in the Authentications table because the `lookupKey` is a scrypt hash of a predefined iv with an email and password combination. If the data in these tables were ever exposed, susceptibility of a [rainbow table attack](https://en.wikipedia.org/wiki/Rainbow_table) could increase because the password is the only unknown property. These tables can be named anything since Hedgehog only interacts with REST API endpoints that will perform CRUD on these tables.
 
 
 
@@ -64,7 +64,7 @@ The values and explanation for fields in the Authentications table (`iv`, `ciphe
 
 
 ##### Users
-| email | ownerWallet |        
+| email | walletAddress |        
 | - | - |
 | email1^@hedgehogtest.com | 0xad7a4b1c64a10ebf7f4995bc88fcbf1749c72611 |
 | seconde*mail@hedgehogtest.com | 0x2b88420100514fbd8a48c3c427c6251335bcd8d0 |
@@ -98,7 +98,7 @@ There are two ways to try to solve this problem: fund user wallets or use EIP-71
 
 #### Fund User Wallets
 
-As part of the endpoint which persists the ownerWallet, you can fund any new `ownerWallet`'s created. When a new wallet is created, you could send a small amount of tokens to that address so the user can sign and send transactions to the chain browser side. The downside is there could be potential for abuse where someone farms accounts to collect tokens because these accounts would be funded directly. 
+As part of the endpoint which persists the walletAddress, you can fund any new `walletAddress`'s created. When a new wallet is created, you could send a small amount of tokens to that address so the user can sign and send transactions to the chain browser side. The downside is there could be potential for abuse where someone farms accounts to collect tokens because these accounts would be funded directly. 
 
 #### EIP-712 Relay Transactions
 
@@ -142,7 +142,7 @@ const makeRequestToService = async (axiosRequestObj) => {
 
 /**
  * The setAuthFn is the endpoint used to send auth data to the backend of your choice 
- * @param {Object} obj contains {iv, cipherText, lookupKey, ownerWallet, email}
+ * @param {Object} obj contains {iv, cipherText, lookupKey, walletAddress, email}
  */
 const setAuthFn = async (obj) => {
   await makeRequestToService({
@@ -154,7 +154,7 @@ const setAuthFn = async (obj) => {
 
 /**
  * The setUserFn is the endpoint used to send user data to the backend of your choice 
- * @param {Object} obj contains {ownerWallet, email}
+ * @param {Object} obj contains {walletAddress, email}
  */
 const setUserFn = async (obj) => {
   await makeRequestToService({

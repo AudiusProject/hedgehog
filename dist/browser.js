@@ -29875,7 +29875,7 @@ class Hedgehog {
 
       const userData = {
         email: email,
-        ownerWallet: walletAddress
+        walletAddress: walletAddress
       }
       await self.setUserFn(userData)
       await self.setAuthFn(authData)
