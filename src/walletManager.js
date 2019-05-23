@@ -41,13 +41,13 @@ class WalletManager {
     return { walletObj: walletObj, entropy: decryptedEntrophy }
   }
 
-  static async createAuthLookupKey (email, password) {
-    // lowercase email so the lookupKey is consistently generated to search in the database
-    email = email.toLowerCase()
+  static async createAuthLookupKey (username, password) {
+    // lowercase username so the lookupKey is consistently generated to search in the database
+    username = username.toLowerCase()
     // This iv is hardcoded because the auth lookup key should be deterministically
-    // generated given the same email and password
+    // generated given the same username and password
     const ivHex = '0x4f7242b39969c3ac4c6712524d633ce9'
-    const { keyHex } = await Authentication.createKey(email + ':::' + password, ivHex)
+    const { keyHex } = await Authentication.createKey(username + ':::' + password, ivHex)
 
     return keyHex
   }

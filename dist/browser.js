@@ -29848,16 +29848,16 @@ class Hedgehog {
   /**
    * Given user credentials, create a client side wallet and all other authentication artifacts,
    * call setFn to persist the artifacts to a server and return the wallet object
-   * @param {String} email user email address
+   * @param {String} username username
    * @param {String} password user password
    * @returns {Object} ethereumjs-wallet wallet object
    */
-  async signUp (email, password) {
+  async signUp (username, password) {
     // TODO (DM) - check that wallet doesn't already exist
     let self = this
 
     const createWalletPromise = WalletManager.createWalletObj(password)
-    const lookupKeyPromise = WalletManager.createAuthLookupKey(email, password)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
 
     try {
       let result = await Promise.all([createWalletPromise, lookupKeyPromise])
@@ -29874,7 +29874,7 @@ class Hedgehog {
       }
 
       const userData = {
-        email: email,
+        username: username,
         walletAddress: walletAddress
       }
       await self.setUserFn(userData)
@@ -29893,13 +29893,13 @@ class Hedgehog {
   /**
    * Given user credentials, attempt to get authentication artifacts from server using
    * getFn, create the private key using the artifacts and the user password
-   * @param {String} email user email address
+   * @param {String} username username
    * @param {String} password user password
    * @returns {Object} ethereumjs-wallet wallet object
    */
-  async login (email, password) {
+  async login (username, password) {
     let self = this
-    let lookupKey = await WalletManager.createAuthLookupKey(email, password)
+    let lookupKey = await WalletManager.createAuthLookupKey(username, password)
     let data = await self.getFn({ lookupKey: lookupKey })
 
     if (data && data.iv && data.cipherText) {
@@ -30062,13 +30062,13 @@ class WalletManager {
     return { walletObj: walletObj, entropy: decryptedEntrophy }
   }
 
-  static async createAuthLookupKey (email, password) {
-    // lowercase email so the lookupKey is consistently generated to search in the database
-    email = email.toLowerCase()
+  static async createAuthLookupKey (username, password) {
+    // lowercase username so the lookupKey is consistently generated to search in the database
+    username = username.toLowerCase()
     // This iv is hardcoded because the auth lookup key should be deterministically
-    // generated given the same email and password
+    // generated given the same username and password
     const ivHex = '0x4f7242b39969c3ac4c6712524d633ce9'
-    const { keyHex } = await Authentication.createKey(email + ':::' + password, ivHex)
+    const { keyHex } = await Authentication.createKey(username + ':::' + password, ivHex)
 
     return keyHex
   }

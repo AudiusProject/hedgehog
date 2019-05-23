@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { Hedgehog, WalletManager } = require('../index')
-const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, email } = require('./helpers')
+const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, username } = require('./helpers')
 
 let hh = null
 let authData = null
@@ -28,7 +28,7 @@ const setDataInDB = (auth, user) => {
   userData = user
 }
 
-// email is `email@address.com`, password is `testpassword`
+// username is `email@address.com`, password is `testpassword`
 const authValues = {
   iv: ivHex,
   cipherText: cipherTextHex,
@@ -38,7 +38,7 @@ const authValues = {
 
 const userValues = {
   walletAddress: addressStr,
-  email
+  username
 }
 
 beforeEach(function () {
@@ -63,7 +63,7 @@ describe('Hedgehog', async function () {
     resetDataInDB()
 
     try {
-      await hh.login(email, password)
+      await hh.login(username, password)
       assert.fail('Should not login if there\'s non user record')
     } catch (e) {
       assert.deepStrictEqual(1, 1)
@@ -75,7 +75,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     resetDataInDB()
 
-    let walletObj = await hh.signUp(email, password)
+    let walletObj = await hh.signUp(username, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
 
     assert.deepStrictEqual(hh.isLoggedIn(), true)
@@ -86,7 +86,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
 
-    let walletObj = await hh.login(email, password)
+    let walletObj = await hh.login(username, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
