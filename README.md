@@ -41,15 +41,19 @@ Currently available wallets treat every transaction as if it were moving around 
 ### Is Hedgehog Right for your DApp?
 Hedgehog isn’t right for every DApp. Massive improvements in user experience are only possible through tradeoffs. As a general rule Hedgehog should not be used for apps involving significant sums of money. As a bridge, one could start users on Hedgehog and suggest migrating to a more secure wallet if their stored value increases beyond a certain threshold; the Hedgehog paradigm is interoperable with existing web3 providers too.
 
-[Good use cases]
-* Signing data
-* Gaming DApp
-* Decentralized Music Player
+*[Good use cases]*
 
-[Bad use cases]
-* Banking DApp
-* Decentralized Lending
-* Prediction Markets
+* **Signing data**: If you’re building decentralized applications that rely on user signed data (eg. via EIP-712-esque signing schemes), Hedgehog could help simplify the experience if the stakes are low enough.
+* **Gaming DApp**: Nothing ruins fun as much as signing transactions. If you’re building a gaming DApp that doesn’t use significant financial assets, improving UX is key.
+* **Decentralized Music Player**: If you’re building consumer-facing DApps, Hedgehog will dramatically improve user experience and significantly increase your potential userbase. 
+
+*[Bad use cases]*
+
+If your DApp involves moving around significant sums of money, then the tradeoff in security is most likely not worth it. Hedgehog’s primary improvement to end-user experience is by hiding the wallet and not forcing users to confirm transactions - The opposite of what you’d want when moving money around. We absolutely don’t recommend using Hedgehog in situations like these:
+
+* **Banking DApp**
+* **Decentralized Lending**
+* **Prediction Markets**
 
 
 ## A Closer Look 
