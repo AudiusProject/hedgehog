@@ -24,7 +24,7 @@ class WalletManager {
     let entropy
 
     if (!password) return new Error('Missing property: password')
-    
+
     const { ivBuffer, ivHex } = Authentication.createIV()
     const { keyBuffer } = await Authentication.createKey(password, ivHex)
     if (!entropyOverride) {
