@@ -19,12 +19,19 @@ const hedgehogEntropyKey = 'hedgehog-entropy-key'
 // packages expect different formats. So if a value is used in multiple formats, all
 // the formats are returned by the generation function
 class WalletManager {
-  static async createWalletObj (password) {
+  static async createWalletObj (password, entropyOverride = null) {
     let self = this
+    let entropy
 
+    if (!password) return new Error('Missing property: password')
+    
     const { ivBuffer, ivHex } = Authentication.createIV()
     const { keyBuffer } = await Authentication.createKey(password, ivHex)
-    const { entropy } = Authentication.generateMnemonicAndEntropy()
+    if (!entropyOverride) {
+      entropy = Authentication.generateMnemonicAndEntropy()['entropy']
+    } else {
+      entropy = entropyOverride
+    }
     let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
     const { cipherTextHex } = Authentication.encrypt(entropy, ivBuffer, keyBuffer)
 
