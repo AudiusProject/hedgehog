@@ -26,7 +26,6 @@ class Hedgehog {
    * @returns {Object} ethereumjs-wallet wallet object
    */
   async signUp (username, password) {
-    // TODO (DM) - check that wallet doesn't already exist
     let self = this
 
     const createWalletPromise = WalletManager.createWalletObj(password)

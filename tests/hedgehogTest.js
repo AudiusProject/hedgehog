@@ -28,7 +28,6 @@ const setDataInDB = (auth, user) => {
   userData = user
 }
 
-// username is `email@address.com`, password is `testpassword`
 const authValues = {
   iv: ivHex,
   cipherText: cipherTextHex,

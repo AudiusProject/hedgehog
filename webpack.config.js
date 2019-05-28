@@ -27,11 +27,3 @@ var config = {
 }
 
 module.exports = config
-
-// module.exports = {
-//   mode: 'development',
-//   entry: './index.js',
-//   output: {
-//     filename: 'index.bundle.js'
-//   }
-// };

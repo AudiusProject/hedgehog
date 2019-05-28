@@ -46,7 +46,7 @@ describe('WalletManager', async function () {
     assert.deepStrictEqual(WalletManager.getEntropyFromLocalStorage(), entropy)
   })
 
-  it('should check that we can\'t retrieve a wallet from localhost if entropy is null', async function () {
+  it(`should check that we can't retrieve a wallet from localhost if entropy is null`, async function () {
     WalletManager.deleteEntropyFromLocalStorage()
     let walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
 

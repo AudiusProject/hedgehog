@@ -46,6 +46,7 @@
   "nyc": {
     "exclude": [
       "src/authWorker.js",
+      "src/utils.js",
       "tests/**/*.js"
     ]
   },

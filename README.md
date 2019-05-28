@@ -22,7 +22,7 @@ With Hedgehog:
 ## Installation
 
 ```
-npm install --save @audius/hedgehog
+npm i --save @audius/hedgehog
 ```
 
 ## Docs && Examples
