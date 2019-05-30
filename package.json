@@ -1,6 +1,6 @@
 {
   "name": "@audius/hedgehog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Metamask alternative that empowers you to build good UX",
   "browser": {
     "node-localstorage": false
@@ -51,5 +51,5 @@
     ]
   },
   "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }
