@@ -17,7 +17,7 @@ With Hedgehog:
 * 🔏 You can build systems that fund users' wallets, sign transactions, but never control those wallets directly.
 * 🌇 You can focus on building your business logic, rather than managing wallets.
 
-[![npm version](https://badge.fury.io/js/angular.svg)](https://badge.fury.io/js/angular) [![CircleCI](https://circleci.com/gh/AudiusProject/hedgehog.svg?style=svg&circle-token=dc1943e26d04e05beca719fb45baaab93fe04bce)](https://circleci.com/gh/AudiusProject/audius-hedgehog)
+[![npm version](https://badge.fury.io/js/angular.svg)](https://badge.fury.io/js/@audius/hedgehog) [![CircleCI](https://circleci.com/gh/AudiusProject/hedgehog.svg?style=svg&circle-token=dc1943e26d04e05beca719fb45baaab93fe04bce)](https://circleci.com/gh/AudiusProject/audius-hedgehog)
 
 ## Installation
 
@@ -27,7 +27,7 @@ npm i --save @audius/hedgehog
 
 ## Docs && Examples
 
-Check out our full technical [docs](http://audius.github.io/hedgehog-docs) and [api how-to](http://audius.github.io/hedgehog-docs#how-to).
+Check out our full technical [docs](http://audiusproject.github.io/hedgehog-docs) and [api how-to](http://audiusproject.github.io/hedgehog-docs#how-to).
 
 For a quick browser-side demo, [look no further](https://codesandbox.io/embed/pp9zzv2n00). For a full end-to-end auth demonstration, see our [demo repo](https://github.com/AudiusProject/audius-hedgehog-demo).
 
@@ -78,4 +78,4 @@ if (hedgehog.isLoggedIn()) {
 
 After creating or retrieving a user's wallet, you can either **fund their wallet directly** to pay transaction fees or **relay their transactions through a EIP-712 relayer**.
 
-More details in the [docs](http://audius.github.io/hedgehog-docs).
+More details in the [docs](http://audiusproject.github.io/hedgehog-docs).
