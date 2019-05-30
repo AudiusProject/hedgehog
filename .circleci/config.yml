@@ -1,0 +1,25 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10.15.3
+
+    working_directory: ~/audius-hedgehog
+
+    steps:
+      - checkout
+      - run: npm install
+      - run:
+          name: run tests
+          command: npm run test
+
+workflows:
+  version: 2
+  build_pr:
+    jobs:
+      - build
