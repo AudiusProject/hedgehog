@@ -17,7 +17,7 @@ With Hedgehog:
 * 🔏 You can build systems that fund users' wallets, sign transactions, but never control those wallets directly.
 * 🌇 You can focus on building your business logic, rather than managing wallets.
 
-[![npm version](https://badge.fury.io/js/%40audius%2Fhedgehog.svg)](https://badge.fury.io/js/@audius/hedgehog) [![CircleCI](https://circleci.com/gh/AudiusProject/hedgehog.svg?style=svg&circle-token=dc1943e26d04e05beca719fb45baaab93fe04bce)](https://circleci.com/gh/AudiusProject/audius-hedgehog)
+[![npm version](https://badge.fury.io/js/%40audius%2Fhedgehog.svg)](https://badge.fury.io/js/%40audius%2Fhedgehog) [![CircleCI](https://circleci.com/gh/AudiusProject/hedgehog.svg?style=svg&circle-token=dc1943e26d04e05beca719fb45baaab93fe04bce)](https://circleci.com/gh/AudiusProject/audius-hedgehog)
 
 ## Installation
 
