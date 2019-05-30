@@ -8,7 +8,7 @@
 <br />
 <br />
 
-**Hedgehog** is alternative to Metamask that manages a user's private key and wallet on the browser. It exposes a simple API to allow you to create an authentication scheme to let users sign up and login to their wallet across multiple browsers and devices. [hedgehog.audius.co](https://audius.co/hedgehog).
+**Hedgehog** is alternative to Metamask that manages a user's private key and wallet on the browser. It exposes a simple API to allow you to create an authentication scheme to let users sign up and login to their wallet across multiple browsers and devices. [hedgehog.audius.co](https://hedgehog.audius.co).
 
 With Hedgehog:
 
