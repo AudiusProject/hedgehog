@@ -63,19 +63,19 @@ class Authentication {
   }
 
   /**
-   * Given a user password and initialization vector, generate a private key
-   * @param {String} password String from the user of the password attempt
+   * Given a user encryptStr and initialization vector, generate a private key
+   * @param {String} encryptStr String to encrypt (can be user password or some kind of lookup key)
    * @param {String} ivHex hex string iv value
    * @returns {Object} {keyHex: 'dc4b64f2b3adcc062fad2a051ee5d6ac821d8a7f973954b5be476776f41678f2',
    *                    keyBuffer: Uint8Array(32)[220, 75, 100, 242, 179...]}
    */
-  static async createKey (password, ivHex) {
+  static async createKey (encryptStr, ivHex) {
     return new Promise((resolve, reject) => {
       // if this is browser side, use a web worker to create the key
       // otherwise do it server side with node's crypto module
       if (typeof window !== 'undefined' && window && window.Worker) {
         const worker = Utils.WebWorker(authWorker.toString())
-        worker.postMessage(JSON.stringify({ password, ivHex }))
+        worker.postMessage(JSON.stringify({ encryptStr, ivHex }))
 
         worker.onmessage = event => {
           resolve(event.data)
@@ -85,12 +85,12 @@ class Authentication {
         const r = 8
         const p = 1
         const dkLen = 32
-        const passwordBuffer = Buffer.from(password)
+        const encryptStrBuffer = Buffer.from(encryptStr)
         const ivBuffer = Buffer.from(ivHex)
         // https://github.com/nodejs/node/issues/21524#issuecomment-400012811
         const maxmem = 128 * p * r + 128 * (2 + N) * r
 
-        crypto.scrypt(passwordBuffer, ivBuffer, dkLen, { N, r, p, maxmem }, (err, derivedKey) => {
+        crypto.scrypt(encryptStrBuffer, ivBuffer, dkLen, { N, r, p, maxmem }, (err, derivedKey) => {
           if (err) {
             reject(err)
           } else {
