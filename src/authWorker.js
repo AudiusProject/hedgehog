@@ -9,8 +9,8 @@ module.exports = function () {
   self.importScripts('https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/scrypt.min.js')
   self.importScripts('https://raw.githack.com/ricmoo/scrypt-js/master/thirdparty/buffer.js')
 
-  const createKey = (password, ivHex) => {
-    const passwordBuffer = self.buffer.SlowBuffer(password)
+  const createKey = (encryptStr, ivHex) => {
+    const encryptStrBuffer = self.buffer.SlowBuffer(encryptStr)
     const ivBuffer = self.buffer.SlowBuffer(ivHex)
 
     const N = 32768
@@ -18,7 +18,7 @@ module.exports = function () {
     const p = 1
     const dkLen = 32
 
-    self.scrypt(passwordBuffer, ivBuffer, N, r, p, dkLen, function (error, progress, key) {
+    self.scrypt(encryptStrBuffer, ivBuffer, N, r, p, dkLen, function (error, progress, key) {
       if (error) {
         throw error
       } else if (key) {
@@ -34,6 +34,6 @@ module.exports = function () {
   self.onmessage = e => {
     if (!e) return
     let d = JSON.parse(e.data)
-    createKey(d.password, d.ivHex)
+    createKey(d.encryptStr, d.ivHex)
   }
 }
