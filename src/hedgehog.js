@@ -1,4 +1,5 @@
 const WalletManager = require('./walletManager')
+const randomize = require('randomatic')
 
 class Hedgehog {
   constructor (getFn, setAuthFn, setUserFn) {
@@ -59,6 +60,37 @@ class Hedgehog {
     } catch (e) {
       self.logout()
       throw e
+    }
+  }
+
+  /**
+   * Generate secure credentials to allow login
+   * @param {String} username username
+   */
+  async generateRecoveryInfo (username) {
+    let self = this
+    // Generate secure alphanumeric + special char passcode
+    // TODO: Confirm whether this is ecure enough
+    let password = randomize('Aa0', 20)
+    const createWalletPromise = WalletManager.createWalletObj(password)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
+
+    let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+
+    const { ivHex, cipherTextHex } = result[0]
+    const lookupKey = result[1]
+
+    const authData = {
+      iv: ivHex,
+      cipherText: cipherTextHex,
+      lookupKey: lookupKey
+    }
+
+    await self.setAuthFn(authData)
+
+    return {
+      recoveryPassword: password,
+      recoveryData: authData
     }
   }
 

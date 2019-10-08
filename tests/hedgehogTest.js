@@ -125,4 +125,9 @@ describe('Hedgehog', async function () {
     assert.deepStrictEqual(hh.isLoggedIn(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
   })
+
+  it('should create a recovery wallet object', async function () {
+    let recoveryInfo = await hh.generateRecoveryInfo(username)
+    console.log(recoveryInfo)
+  })
 })
