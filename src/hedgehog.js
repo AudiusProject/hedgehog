@@ -64,6 +64,7 @@ class Hedgehog {
 
   /**
    * Generate new set of auth credentials to allow login
+   * TODO: Expose way to eliminate previous credentials
    * @param {String} username - username
    * @param {String} password - new password
    * @param {String} entropy - stored entropy val
