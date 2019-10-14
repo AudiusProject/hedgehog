@@ -64,6 +64,41 @@ class Hedgehog {
   }
 
   /**
+   * Generate new set of auth credentials to allow login
+   * @param {String} username - username
+   * @param {String} password - new password
+   * @param {String} entropy - stored entropy val
+   */
+  async resetPassword (username, password) {
+    let self = this
+    let entropy = await WalletManager.getEntropyFromLocalStorage()
+    if (entropy === null) {
+      throw new Error('resetPassword - missing entropy')
+    }
+
+    const createWalletPromise = WalletManager.createWalletObj(password, entropy)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
+    try {
+      let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+
+      const { ivHex, cipherTextHex, walletObj } = result[0]
+      const lookupKey = result[1]
+
+      const authData = {
+        iv: ivHex,
+        cipherText: cipherTextHex,
+        lookupKey: lookupKey
+      }
+
+      console.log('Resetting auth fn...')
+      await self.setAuthFn(authData)
+      self.wallet = walletObj
+    } catch (e) {
+      self.logout()
+    }
+  }
+
+  /**
    * Generate secure credentials to allow login
    * @param {String} username username
    */
