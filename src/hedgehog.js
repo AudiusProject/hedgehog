@@ -90,7 +90,6 @@ class Hedgehog {
         lookupKey: lookupKey
       }
 
-      console.log('Resetting auth fn...')
       await self.setAuthFn(authData)
       self.wallet = walletObj
     } catch (e) {
