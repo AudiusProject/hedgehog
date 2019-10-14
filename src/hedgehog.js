@@ -63,6 +63,41 @@ class Hedgehog {
   }
 
   /**
+   * Generate new set of auth credentials to allow login
+   * TODO: Expose way to eliminate previous credentials
+   * @param {String} username - username
+   * @param {String} password - new password
+   * @param {String} entropy - stored entropy val
+   */
+  async resetPassword (username, password) {
+    let self = this
+    let entropy = await WalletManager.getEntropyFromLocalStorage()
+    if (entropy === null) {
+      throw new Error('resetPassword - missing entropy')
+    }
+
+    const createWalletPromise = WalletManager.createWalletObj(password, entropy)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
+    try {
+      let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+
+      const { ivHex, cipherTextHex, walletObj } = result[0]
+      const lookupKey = result[1]
+
+      const authData = {
+        iv: ivHex,
+        cipherText: cipherTextHex,
+        lookupKey: lookupKey
+      }
+
+      await self.setAuthFn(authData)
+      self.wallet = walletObj
+    } catch (e) {
+      self.logout()
+    }
+  }
+
+  /**
    * Given user credentials, attempt to get authentication artifacts from server using
    * getFn, create the private key using the artifacts and the user password
    * @param {String} username username
