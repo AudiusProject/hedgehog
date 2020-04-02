@@ -7,7 +7,7 @@
 module.exports = function () {
   // Package and deps for https://github.com/ricmoo/scrypt-js
   self.importScripts('https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/scrypt.min.js')
-  self.importScripts('https://raw.githack.com/ricmoo/scrypt-js/master/thirdparty/buffer.js')
+  self.importScripts('https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/thirdparty/buffer.min.js')
 
   const createKey = (encryptStr, ivHex) => {
     const encryptStrBuffer = self.buffer.SlowBuffer(encryptStr)
