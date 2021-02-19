@@ -42,7 +42,8 @@ class Hedgehog {
       const authData = {
         iv: ivHex,
         cipherText: cipherTextHex,
-        lookupKey: lookupKey
+        lookupKey: lookupKey,
+        walletAddress
       }
 
       const userData = {
