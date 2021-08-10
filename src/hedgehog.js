@@ -1,7 +1,7 @@
 const WalletManager = require('./walletManager')
 
 class Hedgehog {
-  constructor (getFn, setAuthFn, setUserFn) {
+  constructor (getFn, setAuthFn, setUserFn, useLocalStorage = true) {
     if (getFn && setAuthFn && setUserFn) {
       this.getFn = getFn
       this.setAuthFn = setAuthFn
@@ -10,7 +10,7 @@ class Hedgehog {
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
       // on the wallet property in the class
-      if (WalletManager.getEntropyFromLocalStorage()) {
+      if (useLocalStorage && WalletManager.getEntropyFromLocalStorage()) {
         this.restoreLocalWallet()
       }
     } else {
