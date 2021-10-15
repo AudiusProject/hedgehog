@@ -94,8 +94,9 @@ class Hedgehog {
         cipherText: cipherTextHex,
         lookupKey: lookupKey
       }
-      if (oldLookupKey !== null)
+      if (oldLookupKey !== null) {
         authData.oldLookupKey = oldLookupKey
+      }
 
       await self.setAuthFn(authData)
       self.wallet = walletObj
