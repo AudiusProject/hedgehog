@@ -64,12 +64,12 @@ class Hedgehog {
 
   /**
    * Generate new set of auth credentials to allow login
-   * TODO: Expose way to eliminate previous credentials
+   * If the old password is included, the setAuthFn will include the old lookup key for deletion
    * @param {String} username - username
    * @param {String} password - new password
-   * @param {String} entropy - stored entropy val
+   * @param {String} oldPassword - old password
    */
-  async resetPassword (username, password) {
+  async resetPassword (username, password, oldPassword = null) {
     let self = this
     let entropy = await WalletManager.getEntropyFromLocalStorage()
     if (entropy === null) {
@@ -78,17 +78,24 @@ class Hedgehog {
 
     const createWalletPromise = WalletManager.createWalletObj(password, entropy)
     const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
+    const oldLookupKeyPromise =
+        oldPassword !== null
+          ? WalletManager.createAuthLookupKey(username, oldPassword)
+          : Promise.resolve(null)
     try {
-      let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+      let result = await Promise.all([createWalletPromise, lookupKeyPromise, oldLookupKeyPromise])
 
       const { ivHex, cipherTextHex, walletObj } = result[0]
       const lookupKey = result[1]
+      const oldLookupKey = result[2]
 
       const authData = {
         iv: ivHex,
         cipherText: cipherTextHex,
         lookupKey: lookupKey
       }
+      if (oldLookupKey !== null)
+        authData.oldLookupKey = oldLookupKey
 
       await self.setAuthFn(authData)
       self.wallet = walletObj
