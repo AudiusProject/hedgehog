@@ -8,4 +8,8 @@ const addressStr = '0x7c47632073388ae968d30f6c060494fc0cfb4207'
 const lookupKey = '18c6f07f7b891bc5f2c79a20bd39f7971a499f3e7ada02cb2382d40e44661b92'
 const username = 'email@address.com'
 
-module.exports = { PATH, ivHex, keyHex, entropy, password, cipherTextHex, addressStr, lookupKey, username }
+const secondUserLookupKey = '06b52a1cadb6dacfd884eb05077283615089da28c6ebe6d46296742388e5e97a'
+const secondUserUsername = 'test@test2.com'
+const secondUserPassword = 'testpassword'
+
+module.exports = { PATH, ivHex, keyHex, entropy, password, cipherTextHex, addressStr, lookupKey, username, secondUserLookupKey, secondUserPassword, secondUserUsername }

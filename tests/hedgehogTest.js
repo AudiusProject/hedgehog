@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { Hedgehog, WalletManager } = require('../index')
-const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, username } = require('./helpers')
+const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, username, secondUserLookupKey, secondUserPassword, secondUserUsername } = require('./helpers')
 
 let hh = null
 let authData = null
@@ -93,6 +93,28 @@ describe('Hedgehog', async function () {
     hh.logout()
     assert.deepStrictEqual(hh.isLoggedIn(), false)
     assert.deepStrictEqual(!!hh.getWallet(), false)
+  })
+
+  it('should log in and fail one credential confirmation and pass the other', async function () {
+    this.timeout(15000)
+    setDataInDB(authValues, userValues)
+    await hh.login(username, password)
+    assert.strictEqual(await hh.confirmCredentials(username, secondUserPassword), false, 'credentials should not confirm - wrong password')
+    assert.strictEqual(await hh.confirmCredentials(username, password), true, 'credentials should confirm')
+  })
+
+  it('should fail credential confirmation as not logged in', async function () {
+    this.timeout(15000)
+    assert.strictEqual(await hh.confirmCredentials(username, password), false, 'credentials should not confirm - not logged in')
+  })
+
+  it('should fail credential confirmation as the credentials are for the wrong user', async function () {
+    this.timeout(15000)
+    setDataInDB(authValues, userValues)
+    await hh.login(username, password)
+    setDataInDB({ iv: ivHex, cipherText: cipherTextHex, lookupKey: secondUserLookupKey }, { walletAddress: '', secondUserUsername })
+    const result = await hh.confirmCredentials(secondUserUsername, secondUserPassword)
+    assert.strictEqual(result, false, 'credentials should not confirm for wrong user')
   })
 
   it('should restore wallet from entropy stored in localStorage', async function () {
