@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { WalletManager } = require('../index')
-const { entropy, addressStr } = require('./helpers')
+const { entropy, walletAddress } = require('./helpers')
 
 describe('WalletManager', async function () {
   it('should create a wallet ', async function () {
@@ -58,6 +58,6 @@ describe('WalletManager', async function () {
     let walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
 
     assert.notDeepStrictEqual(walletObj, null)
-    assert.deepStrictEqual(walletObj.getAddressString(), addressStr)
+    assert.deepStrictEqual(walletObj.getAddressString(), walletAddress)
   })
 })

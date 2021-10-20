@@ -1,14 +1,14 @@
 const assert = require('assert')
 const { Authentication } = require('../index')
 
-const { PATH, ivHex, keyHex, entropy, password, cipherTextHex, addressStr } = require('./helpers')
+const { PATH, ivHex, keyHex, entropy, password, cipherTextHex, walletAddress } = require('./helpers')
 
 describe('Authentication', async function () {
   it('should create a wallet given entropy', async function () {
     const wallet = Authentication.generateWalletFromEntropy(entropy, PATH)
 
     // This address is deterministic given an entropy and path
-    assert.deepStrictEqual(wallet.getAddressString(), addressStr)
+    assert.deepStrictEqual(wallet.getAddressString(), walletAddress)
   })
 
   it('should generate a mnemonic and entropy', async function () {

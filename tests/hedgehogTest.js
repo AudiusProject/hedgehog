@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { Hedgehog, WalletManager } = require('../index')
-const { ivHex, entropy, password, cipherTextHex, addressStr, lookupKey, username, secondUserLookupKey, secondUserPassword, secondUserUsername } = require('./helpers')
+const { ivHex, entropy, password, cipherTextHex, walletAddress, lookupKey, username, users } = require('./helpers')
 
 let hh = null
 let authData = null
@@ -36,15 +36,15 @@ const authValues = {
 }
 
 const userValues = {
-  walletAddress: addressStr,
+  walletAddress,
   username
 }
 
 beforeEach(function () {
   // brand new hedgehog instance before each test block
   // also clears entropy from local storage so there is no wallet or localStorage state between tests
-  hh = new Hedgehog(getFn, setAuthFn, setUserFn)
   WalletManager.deleteEntropyFromLocalStorage()
+  hh = new Hedgehog(getFn, setAuthFn, setUserFn)
 })
 
 describe('Hedgehog', async function () {
@@ -99,7 +99,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
     await hh.login(username, password)
-    assert.strictEqual(await hh.confirmCredentials(username, secondUserPassword), false, 'credentials should not confirm - wrong password')
+    assert.strictEqual(await hh.confirmCredentials(username, password + '~'), false, 'credentials should not confirm - wrong password')
     assert.strictEqual(await hh.confirmCredentials(username, password), true, 'credentials should confirm')
   })
 
@@ -112,15 +112,15 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
     await hh.login(username, password)
-    setDataInDB({ iv: ivHex, cipherText: cipherTextHex, lookupKey: secondUserLookupKey }, { walletAddress: '', secondUserUsername })
-    const result = await hh.confirmCredentials(secondUserUsername, secondUserPassword)
+    setDataInDB({ iv: users[1].ivHex, cipherText: users[1].cipherTextHex, lookupKey: users[1].lookupKey }, { walletAddress: users[1].walletAddress, username: users[1].username })
+    const result = await hh.confirmCredentials(users[1].username, users[1].password)
     assert.strictEqual(result, false, 'credentials should not confirm for wrong user')
   })
 
   it('should restore wallet from entropy stored in localStorage', async function () {
     WalletManager.setEntropyInLocalStorage(entropy)
     let walletObj = hh.restoreLocalWallet()
-    assert.deepStrictEqual(walletObj.getAddressString(), addressStr)
+    assert.deepStrictEqual(walletObj.getAddressString(), walletAddress)
   })
 
   it('should not restore wallet if no entropy stored in localStorage', async function () {

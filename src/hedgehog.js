@@ -135,8 +135,12 @@ class Hedgehog {
    */
   async confirmCredentials (username, password) {
     let self = this
+
+    const existingEntropy = WalletManager.getEntropyFromLocalStorage()
+    if (!existingEntropy) return false // not logged in yet
+
     let lookupKey = await WalletManager.createAuthLookupKey(username, password)
-    let data = await self.getFn({ lookupKey: lookupKey })
+    let data = await self.getFn({ lookupKey })
 
     if (data && data.iv && data.cipherText) {
       const { walletObj, entropy } = await WalletManager.decryptCipherTextAndRetrieveWallet(
@@ -145,11 +149,10 @@ class Hedgehog {
         data.cipherText
       )
 
-      // test against current entropy in localStorage, if present
-      const existingEntropy = WalletManager.getEntropyFromLocalStorage()
-      console.log({ existingEntropy, entropy, wallet: walletObj.getAddressString(), existingWallet: self.wallet.getAddressString() })
-      return (existingEntropy === null || existingEntropy === entropy) &&
-          (self.wallet && self.wallet.getAddressString() === walletObj.getAddressString())
+      // test against current entropy in localStorage and current wallet
+      return entropy === existingEntropy &&
+          self.wallet !== null &&
+          self.wallet.getAddressString() === walletObj.getAddressString()
     }
     return false
   }
