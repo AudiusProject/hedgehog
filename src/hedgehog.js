@@ -102,6 +102,7 @@ class Hedgehog {
       self.wallet = walletObj
     } catch (e) {
       self.logout()
+      throw e
     }
   }
 
