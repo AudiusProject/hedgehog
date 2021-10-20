@@ -128,6 +128,36 @@ class Hedgehog {
   }
 
   /**
+   * Confirms the user credentials given generate the same entropy after using artifacts from the server
+   * @param {String} username username
+   * @param {String} password user password
+   * @returns {boolean} whether or not the credentials are valid for the current user
+   */
+  async confirmCredentials (username, password) {
+    const self = this
+
+    const existingEntropy = WalletManager.getEntropyFromLocalStorage()
+    if (!existingEntropy) return false // not logged in yet
+
+    const lookupKey = await WalletManager.createAuthLookupKey(username, password)
+    const data = await self.getFn({ lookupKey })
+
+    if (data && data.iv && data.cipherText) {
+      const { walletObj, entropy } = await WalletManager.decryptCipherTextAndRetrieveWallet(
+        password,
+        data.iv,
+        data.cipherText
+      )
+
+      // test against current entropy in localStorage and current wallet
+      return entropy === existingEntropy &&
+          self.wallet !== null &&
+          self.wallet.getAddressString() === walletObj.getAddressString()
+    }
+    return false
+  }
+
+  /**
    * Deletes the local client side wallet including entropy and all associated
    * authentication artifacts
    */

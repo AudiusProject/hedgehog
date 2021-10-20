@@ -55,7 +55,6 @@ class WalletManager {
     // generated given the same username and password
     const ivHex = '0x4f7242b39969c3ac4c6712524d633ce9'
     const { keyHex } = await Authentication.createKey(username + ':::' + password, ivHex)
-
     return keyHex
   }
 
