@@ -67,9 +67,8 @@ class Hedgehog {
    * If the old password is included, the setAuthFn will include the old lookup key for deletion
    * @param {String} username - username
    * @param {String} password - new password
-   * @param {String} oldPassword - old password
    */
-  async resetPassword (username, password, oldPassword = null) {
+  async resetPassword (username, password) {
     let self = this
     let entropy = await WalletManager.getEntropyFromLocalStorage()
     if (entropy === null) {
@@ -78,10 +77,44 @@ class Hedgehog {
 
     const createWalletPromise = WalletManager.createWalletObj(password, entropy)
     const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
-    const oldLookupKeyPromise =
-        oldPassword !== null
-          ? WalletManager.createAuthLookupKey(username, oldPassword)
-          : Promise.resolve(null)
+
+    try {
+      let result = await Promise.all([createWalletPromise, lookupKeyPromise])
+
+      const { ivHex, cipherTextHex, walletObj } = result[0]
+      const lookupKey = result[1]
+
+      const authData = {
+        iv: ivHex,
+        cipherText: cipherTextHex,
+        lookupKey: lookupKey
+      }
+
+      await self.setAuthFn(authData)
+      self.wallet = walletObj
+    } catch (e) {
+      self.logout()
+      throw e
+    }
+  }
+
+  /**
+   * Generate new set of auth credentials to allow login and remove the old password
+   * Note: Doesn't log out on error
+   * @param {String} username - username
+   * @param {String} password - new password
+   * @param {String} oldPassword - old password
+   */
+  async changePassword (username, password, oldPassword) {
+    let self = this
+    let entropy = await WalletManager.getEntropyFromLocalStorage()
+    if (entropy === null) {
+      throw new Error('changePassword - missing entropy')
+    }
+
+    const createWalletPromise = WalletManager.createWalletObj(password, entropy)
+    const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
+    const oldLookupKeyPromise = WalletManager.createAuthLookupKey(username, oldPassword)
     try {
       let result = await Promise.all([createWalletPromise, lookupKeyPromise, oldLookupKeyPromise])
 
@@ -92,16 +125,13 @@ class Hedgehog {
       const authData = {
         iv: ivHex,
         cipherText: cipherTextHex,
-        lookupKey: lookupKey
-      }
-      if (oldLookupKey !== null) {
-        authData.oldLookupKey = oldLookupKey
+        lookupKey: lookupKey,
+        oldLookupKey: oldLookupKey
       }
 
       await self.setAuthFn(authData)
       self.wallet = walletObj
     } catch (e) {
-      self.logout()
       throw e
     }
   }
