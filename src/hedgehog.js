@@ -109,7 +109,7 @@ class Hedgehog {
     let self = this
     let entropy = await WalletManager.getEntropyFromLocalStorage()
     if (entropy === null) {
-      throw new Error('resetPassword - missing entropy')
+      throw new Error('changePassword - missing entropy')
     }
 
     const createWalletPromise = WalletManager.createWalletObj(password, entropy)
