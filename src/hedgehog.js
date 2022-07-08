@@ -9,17 +9,26 @@ class Hedgehog {
       this.setUserFn = setUserFn
       this.wallet = null
       this.localStorage = localStorage
+      this.isReady = false
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
       // on the wallet property in the class
       if (useLocalStorage) {
-        WalletManager.getEntropyFromLocalStorage(this.localStorage).then(() => {
-          this.restoreLocalWallet()
+        WalletManager.getEntropyFromLocalStorage(localStorage).then(() => {
+          this.restoreLocalWallet().then(() => {
+            this.isReady = true
+          })
         })
+      } else {
+        this.isReady = true
       }
     } else {
       throw new Error('Please pass in valid getFn, setAuthFn and setUserFn parameters into the Hedgehog constructor')
     }
+  }
+
+  isReady () {
+    return this.isReady
   }
 
   /**
