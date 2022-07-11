@@ -27,6 +27,13 @@ class Hedgehog {
     }
   }
 
+  /** 
+   * Helper function to check if Hedgehog instance is ready.
+   * Only needed if ALL the following are true:
+   * - `useLocalStorage = true`
+   * - a custom `localStorage` was specified, and the custom local storage has asynchronous methods (getters and setters).
+   * Otherwise, Hedgehog will be ready as soon as it is initialized.
+   */
   isReady () {
     return this.isReady
   }
