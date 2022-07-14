@@ -9,18 +9,17 @@ class Hedgehog {
       this.setUserFn = setUserFn
       this.wallet = null
       this.localStorage = localStorage
-      this.isReady = false
+      this.ready = false
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
       // on the wallet property in the class
+      
       if (useLocalStorage) {
-        WalletManager.getEntropyFromLocalStorage(localStorage).then(() => {
-          this.restoreLocalWallet().then(() => {
-            this.isReady = true
-          })
+        this.restoreLocalWallet().then(() => {
+          this.ready = true
         })
       } else {
-        this.isReady = true
+        this.ready = true
       }
     } else {
       throw new Error('Please pass in valid getFn, setAuthFn and setUserFn parameters into the Hedgehog constructor')
@@ -29,13 +28,20 @@ class Hedgehog {
 
   /** 
    * Helper function to check if Hedgehog instance is ready.
-   * Only needed if ALL the following are true:
-   * - `useLocalStorage = true`
-   * - a custom `localStorage` was specified, and the custom local storage has asynchronous methods (getters and setters).
-   * Otherwise, Hedgehog will be ready as soon as it is initialized.
+   * Only needed if `useLocalStorage = true`
+   * Otherwise, Hedgehog will be ready as soon as it is constructed.
    */
   isReady () {
-    return this.isReady
+    return this.ready
+  }
+
+  /** 
+   * Helper function to wait until Hedgehog instance is ready.
+   * Only needed if `useLocalStorage = true`
+   * Otherwise, Hedgehog will be ready as soon as it is constructed.
+   */
+  async waitUntilReady () {
+    await Utils.waitUntil(() => this.isReady())
   }
 
   /**

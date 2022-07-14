@@ -28,6 +28,19 @@ class Utils {
       return window.localStorage
     }
   }
+
+  static waitUntil (condition) {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (!condition()) {
+          return
+        }
+  
+        clearInterval(interval)
+        resolve()
+      }, 100)
+    })
+  }
 }
 
 module.exports = Utils
