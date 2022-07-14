@@ -32,7 +32,6 @@ class Hedgehog {
    * Otherwise, Hedgehog will be ready as soon as it is constructed.
    */
   isReady () {
-    console.log('testing ready')
     return this.ready
   }
 
