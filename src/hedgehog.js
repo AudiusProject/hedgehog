@@ -13,7 +13,7 @@ class Hedgehog {
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
       // on the wallet property in the class
-      
+
       if (useLocalStorage) {
         this.restoreLocalWallet().then(() => {
           this.ready = true
@@ -26,16 +26,17 @@ class Hedgehog {
     }
   }
 
-  /** 
+  /**
    * Helper function to check if Hedgehog instance is ready.
    * Only needed if `useLocalStorage = true`
    * Otherwise, Hedgehog will be ready as soon as it is constructed.
    */
   isReady () {
+    console.log('testing ready')
     return this.ready
   }
 
-  /** 
+  /**
    * Helper function to wait until Hedgehog instance is ready.
    * Only needed if `useLocalStorage = true`
    * Otherwise, Hedgehog will be ready as soon as it is constructed.

@@ -35,7 +35,7 @@ class Utils {
         if (!condition()) {
           return
         }
-  
+
         clearInterval(interval)
         resolve()
       }, 100)
