@@ -2,11 +2,13 @@
 
 const path = require('path')
 
-const clientConfig = {
+var config = {
   target: 'web',
   mode: process.env.NODE_ENV || 'development',
   devtool: 'source-map',
-  entry: ['./index.js'],
+  entry: [
+    './index.js'
+  ],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'browser.js',
@@ -24,25 +26,4 @@ const clientConfig = {
   }
 }
 
-const serverConfig = {
-  target: 'node',
-  mode: process.env.NODE_ENV || 'development',
-  devtool: 'source-map',
-  entry: ['./index.js'],
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'hedgehog.js',
-    libraryTarget: 'umd'
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsm$/,
-        exclude: /node_modules/,
-        use: 'babel-loader'
-      }
-    ]
-  }
-}
-
-module.exports = [clientConfig, serverConfig]
+module.exports = config

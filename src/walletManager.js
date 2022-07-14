@@ -1,6 +1,14 @@
 const Utils = require('./utils')
 const Authentication = require('./authentication')
 
+let localStorageReference
+if (typeof window === 'undefined' || window === null) {
+  const LocalStorage = require('node-localstorage').LocalStorage
+  localStorageReference = new LocalStorage('./local-storage')
+} else {
+  localStorageReference = window.localStorage
+}
+
 // primary account management key for HD wallet
 // TODO - make these options that can be overridden
 const PATH = "m/44'/60'/0'/0/0"
@@ -11,7 +19,7 @@ const hedgehogEntropyKey = 'hedgehog-entropy-key'
 // packages expect different formats. So if a value is used in multiple formats, all
 // the formats are returned by the generation function
 class WalletManager {
-  static async createWalletObj (password, entropyOverride = null, localStorage) {
+  static async createWalletObj (password, entropyOverride = null) {
     let self = this
     let entropy
 
@@ -25,37 +33,17 @@ class WalletManager {
       entropy = entropyOverride
     }
     let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
-    const { cipherTextHex } = Authentication.encrypt(
-      entropy,
-      ivBuffer,
-      keyBuffer
-    )
+    const { cipherTextHex } = Authentication.encrypt(entropy, ivBuffer, keyBuffer)
 
-    await self.setEntropyInLocalStorage(entropy, localStorage)
-    return {
-      ivHex: ivHex,
-      cipherTextHex: cipherTextHex,
-      walletObj: walletObj,
-      entropy: entropy
-    }
+    self.setEntropyInLocalStorage(entropy)
+    return { ivHex: ivHex, cipherTextHex: cipherTextHex, walletObj: walletObj, entropy: entropy }
   }
 
-  static async decryptCipherTextAndRetrieveWallet (
-    password,
-    ivHex,
-    cipherTextHex
-  ) {
+  static async decryptCipherTextAndRetrieveWallet (password, ivHex, cipherTextHex) {
     const { keyBuffer } = await Authentication.createKey(password, ivHex)
     const ivBuffer = Utils.bufferFromHexString(ivHex)
-    const decryptedEntrophy = Authentication.decrypt(
-      ivBuffer,
-      keyBuffer,
-      cipherTextHex
-    )
-    let walletObj = Authentication.generateWalletFromEntropy(
-      decryptedEntrophy,
-      PATH
-    )
+    const decryptedEntrophy = Authentication.decrypt(ivBuffer, keyBuffer, cipherTextHex)
+    let walletObj = Authentication.generateWalletFromEntropy(decryptedEntrophy, PATH)
 
     return { walletObj: walletObj, entropy: decryptedEntrophy }
   }
@@ -66,15 +54,12 @@ class WalletManager {
     // This iv is hardcoded because the auth lookup key should be deterministically
     // generated given the same username and password
     const ivHex = '0x4f7242b39969c3ac4c6712524d633ce9'
-    const { keyHex } = await Authentication.createKey(
-      username + ':::' + password,
-      ivHex
-    )
+    const { keyHex } = await Authentication.createKey(username + ':::' + password, ivHex)
     return keyHex
   }
 
-  static async getEntropyFromLocalStorage (localStorage) {
-    let entropy = await localStorage.getItem(hedgehogEntropyKey)
+  static getEntropyFromLocalStorage () {
+    let entropy = localStorageReference.getItem(hedgehogEntropyKey)
 
     // Sometimes the string 'undefined' was being written to localstorage
     // this is an explicit check for that
@@ -83,8 +68,8 @@ class WalletManager {
     } else return null
   }
 
-  static async getWalletObjFromLocalStorageIfExists (localStorage) {
-    let entropy = await this.getEntropyFromLocalStorage(localStorage)
+  static getWalletObjFromLocalStorageIfExists () {
+    let entropy = this.getEntropyFromLocalStorage()
     if (entropy) {
       let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH)
 
@@ -93,12 +78,12 @@ class WalletManager {
     } else return null
   }
 
-  static async setEntropyInLocalStorage (entropy, localStorage) {
-    await localStorage.setItem(hedgehogEntropyKey, entropy)
+  static setEntropyInLocalStorage (entropy) {
+    localStorageReference.setItem(hedgehogEntropyKey, entropy)
   }
 
-  static async deleteEntropyFromLocalStorage (localStorage) {
-    await localStorage.removeItem(hedgehogEntropyKey)
+  static deleteEntropyFromLocalStorage () {
+    localStorageReference.removeItem(hedgehogEntropyKey)
   }
 }
 

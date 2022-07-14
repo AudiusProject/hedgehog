@@ -1,47 +1,21 @@
-const Utils = require('./utils')
 const WalletManager = require('./walletManager')
 
 class Hedgehog {
-  constructor (getFn, setAuthFn, setUserFn, useLocalStorage = true, localStorage = Utils.getPlatformLocalStorage()) {
+  constructor (getFn, setAuthFn, setUserFn, useLocalStorage = true) {
     if (getFn && setAuthFn && setUserFn) {
       this.getFn = getFn
       this.setAuthFn = setAuthFn
       this.setUserFn = setUserFn
       this.wallet = null
-      this.localStorage = localStorage
-      this.ready = false
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
       // on the wallet property in the class
-
-      if (useLocalStorage) {
-        this.restoreLocalWallet().then(() => {
-          this.ready = true
-        })
-      } else {
-        this.ready = true
+      if (useLocalStorage && WalletManager.getEntropyFromLocalStorage()) {
+        this.restoreLocalWallet()
       }
     } else {
       throw new Error('Please pass in valid getFn, setAuthFn and setUserFn parameters into the Hedgehog constructor')
     }
-  }
-
-  /**
-   * Helper function to check if Hedgehog instance is ready.
-   * Only needed if `useLocalStorage = true`
-   * Otherwise, Hedgehog will be ready as soon as it is constructed.
-   */
-  isReady () {
-    return this.ready
-  }
-
-  /**
-   * Helper function to wait until Hedgehog instance is ready.
-   * Only needed if `useLocalStorage = true`
-   * Otherwise, Hedgehog will be ready as soon as it is constructed.
-   */
-  async waitUntilReady () {
-    await Utils.waitUntil(() => this.isReady())
   }
 
   /**
@@ -54,7 +28,7 @@ class Hedgehog {
   async signUp (username, password) {
     let self = this
 
-    const createWalletPromise = WalletManager.createWalletObj(password, null, this.localStorage)
+    const createWalletPromise = WalletManager.createWalletObj(password)
     const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
 
     try {
@@ -83,7 +57,7 @@ class Hedgehog {
 
       return walletObj
     } catch (e) {
-      await self.logout()
+      self.logout()
       throw e
     }
   }
@@ -96,12 +70,12 @@ class Hedgehog {
    */
   async resetPassword (username, password) {
     let self = this
-    let entropy = await WalletManager.getEntropyFromLocalStorage(this.localStorage)
+    let entropy = await WalletManager.getEntropyFromLocalStorage()
     if (entropy === null) {
       throw new Error('resetPassword - missing entropy')
     }
 
-    const createWalletPromise = WalletManager.createWalletObj(password, entropy, this.localStorage)
+    const createWalletPromise = WalletManager.createWalletObj(password, entropy)
     const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
 
     try {
@@ -119,7 +93,7 @@ class Hedgehog {
       await self.setAuthFn(authData)
       self.wallet = walletObj
     } catch (e) {
-      await self.logout()
+      self.logout()
       throw e
     }
   }
@@ -133,12 +107,12 @@ class Hedgehog {
    */
   async changePassword (username, password, oldPassword) {
     let self = this
-    let entropy = await WalletManager.getEntropyFromLocalStorage(this.localStorage)
+    let entropy = await WalletManager.getEntropyFromLocalStorage()
     if (entropy === null) {
       throw new Error('changePassword - missing entropy')
     }
 
-    const createWalletPromise = WalletManager.createWalletObj(password, entropy, this.localStorage)
+    const createWalletPromise = WalletManager.createWalletObj(password, entropy)
     const lookupKeyPromise = WalletManager.createAuthLookupKey(username, password)
     const oldLookupKeyPromise = WalletManager.createAuthLookupKey(username, oldPassword)
     try {
@@ -185,7 +159,7 @@ class Hedgehog {
       self.wallet = walletObj
 
       // set entropy in localStorage
-      await WalletManager.setEntropyInLocalStorage(entropy, this.localStorage)
+      WalletManager.setEntropyInLocalStorage(entropy)
       return walletObj
     } else {
       throw new Error('No account record for user')
@@ -201,7 +175,7 @@ class Hedgehog {
   async confirmCredentials (username, password) {
     const self = this
 
-    const existingEntropy = await WalletManager.getEntropyFromLocalStorage(this.localStorage)
+    const existingEntropy = WalletManager.getEntropyFromLocalStorage()
     if (!existingEntropy) return false // not logged in yet
 
     const lookupKey = await WalletManager.createAuthLookupKey(username, password)
@@ -226,9 +200,9 @@ class Hedgehog {
    * Deletes the local client side wallet including entropy and all associated
    * authentication artifacts
    */
-  async logout () {
+  logout () {
     delete this.wallet
-    await WalletManager.deleteEntropyFromLocalStorage(this.localStorage)
+    WalletManager.deleteEntropyFromLocalStorage()
   }
 
   /**
@@ -254,8 +228,8 @@ class Hedgehog {
    * @returns {Object/null} If the user has a wallet client side, the wallet object is returned,
    *                        otherwise null is returned
    */
-  async restoreLocalWallet () {
-    const walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(this.localStorage)
+  restoreLocalWallet () {
+    const walletObj = WalletManager.getWalletObjFromLocalStorageIfExists()
     if (walletObj) {
       this.wallet = walletObj
       return walletObj
@@ -270,9 +244,9 @@ class Hedgehog {
    */
   async createWalletObj (password) {
     if (password) {
-      const { walletObj, entropy } = await WalletManager.createWalletObj(password, null, this.localStorage)
+      const { walletObj, entropy } = await WalletManager.createWalletObj(password)
       this.wallet = walletObj
-      await WalletManager.setEntropyInLocalStorage(entropy, this.localStorage)
+      WalletManager.setEntropyInLocalStorage(entropy)
       return walletObj
     } else {
       throw new Error('Please pass in a valid password')
