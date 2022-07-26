@@ -7,20 +7,20 @@
 module.exports = function () {
   // Package and deps for https://github.com/ricmoo/scrypt-js
   self.importScripts(
-    "https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/scrypt.min.js"
-  );
+    'https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/scrypt.min.js'
+  )
   self.importScripts(
-    "https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/thirdparty/buffer.min.js"
-  );
+    'https://cdn.jsdelivr.net/npm/scrypt-js@2.0.4/thirdparty/buffer.min.js'
+  )
 
   const createKey = (encryptStr, ivHex) => {
-    const encryptStrBuffer = self.buffer.SlowBuffer(encryptStr);
-    const ivBuffer = self.buffer.SlowBuffer(ivHex);
+    const encryptStrBuffer = self.buffer.SlowBuffer(encryptStr)
+    const ivBuffer = self.buffer.SlowBuffer(ivHex)
 
-    const N = 32768;
-    const r = 8;
-    const p = 1;
-    const dkLen = 32;
+    const N = 32768
+    const r = 8
+    const p = 1
+    const dkLen = 32
 
     self.scrypt(
       encryptStrBuffer,
@@ -31,21 +31,21 @@ module.exports = function () {
       dkLen,
       function (error, progress, key) {
         if (error) {
-          throw error;
+          throw error
         } else if (key) {
-          key = new self.buffer.SlowBuffer(key);
-          const keyHex = key.toString("hex");
-          postMessage({ keyHex: keyHex, keyBuffer: key });
+          key = new self.buffer.SlowBuffer(key)
+          const keyHex = key.toString('hex')
+          postMessage({ keyHex, keyBuffer: key })
         }
         // no else clause here, the progress triggers the else clause
         // but there's no key yet at that point
       }
-    );
-  };
+    )
+  }
 
   self.onmessage = (e) => {
-    if (!e) return;
-    let d = JSON.parse(e.data);
-    createKey(d.encryptStr, d.ivHex);
-  };
-};
+    if (!e) return
+    const d = JSON.parse(e.data)
+    createKey(d.encryptStr, d.ivHex)
+  }
+}

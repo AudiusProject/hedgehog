@@ -32,7 +32,7 @@
   "scripts": {
     "build": "rollup -c",
     "lint": "standard",
-    "lint-fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "test": "node_modules/.bin/mocha --require ts-node/register tests"
   },

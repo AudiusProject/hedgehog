@@ -1,29 +1,29 @@
-import rollupTypescript from "rollup-plugin-typescript2";
-import copy from "rollup-plugin-copy";
+import rollupTypescript from 'rollup-plugin-typescript2'
+import copy from 'rollup-plugin-copy'
 
-import pkg from "./package.json";
+import pkg from './package.json'
 
 export default [
   {
-    input: "src/index.ts",
+    input: 'src/index.ts',
     output: {
       file: pkg.main,
-      format: "cjs",
-      exports: "named",
-      sourcemap: true,
+      format: 'cjs',
+      exports: 'named',
+      sourcemap: true
     },
     external: [
-      "bip39",
-      "browserify-cipher/browser",
-      "ethereumjs-wallet",
-      "node-localstorage",
-      "randombytes",
-      "safe-buffer",
-      "./src/authWorker.js",
+      'bip39',
+      'browserify-cipher/browser',
+      'ethereumjs-wallet',
+      'node-localstorage',
+      'randombytes',
+      'safe-buffer',
+      './src/authWorker.js'
     ],
     plugins: [
       rollupTypescript(),
-      copy({ targets: [{ src: "./src/authWorker.js", dest: "dist" }] }),
-    ],
-  },
-];
+      copy({ targets: [{ src: './src/authWorker.js', dest: 'dist' }] })
+    ]
+  }
+]
