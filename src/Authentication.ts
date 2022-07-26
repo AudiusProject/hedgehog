@@ -4,7 +4,12 @@
  * All public functions are exposed via hedgehog.js and walletManager.js
  */
 
-import bip39 from "bip39";
+import {
+  entropyToMnemonic,
+  generateMnemonic,
+  mnemonicToEntropy,
+  mnemonicToSeed,
+} from "bip39";
 import { hdkey } from "ethereumjs-wallet";
 import randomBytes from "randombytes";
 import crypto from "crypto";
@@ -27,7 +32,7 @@ export class Authentication {
    * @returns ethereumjs-wallet wallet object
    */
   static async generateWalletFromEntropy(entropy: string, path: string) {
-    const seed = await bip39.mnemonicToSeed(bip39.entropyToMnemonic(entropy));
+    const seed = await mnemonicToSeed(entropyToMnemonic(entropy));
 
     // generate HD wallet, not necessary for authentication
     const hdwallet = hdkey.fromMasterSeed(seed);
@@ -43,10 +48,10 @@ export class Authentication {
    * @returns `{mnemonic: '...mnemonic string...', entropy: '47b0e5e107cccc3297d88647c6e84a9f'}`
    */
   static generateMnemonicAndEntropy() {
-    const mnemonic = bip39.generateMnemonic();
+    const mnemonic = generateMnemonic();
 
     // this is what we encrypt as private key
-    const entropy = bip39.mnemonicToEntropy(mnemonic);
+    const entropy = mnemonicToEntropy(mnemonic);
 
     return { mnemonic: mnemonic, entropy: entropy };
   }

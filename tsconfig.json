@@ -2,10 +2,13 @@
   "extends": "@tsconfig/node16-strictest/tsconfig.json",
   "compilerOptions": {
     "lib": ["es2021", "dom"],
+    "module": "ESNext",
     "checkJs": false,
     "resolveJsonModule": true,
     "exactOptionalPropertyTypes": false,
-    "noEmit": true
+    "typeRoots": ["./node_modules/@types"],
+    "noEmit": true,
+    "declaration": true
   },
-  "exclude": ["**/*+(test).ts"]
+  "include": ["src/**/*"]
 }

@@ -3,19 +3,19 @@ import type { LocalStorage } from "./types";
 import { getPlatformLocalStorage, waitUntil } from "./utils";
 import { WalletManager } from "./WalletManager";
 
-type GetFn = (params: {
+export type GetFn = (params: {
   lookupKey: string;
 }) =>
   | Promise<{ iv: string; cipherText: string }>
   | { iv: string; cipherText: string };
 
-type SetAuthFn = (params: {
+export type SetAuthFn = (params: {
   iv: string;
   cipherText: string;
   lookupKey: string;
 }) => any | Promise<any>;
 
-type SetUserFn = (params: {
+export type SetUserFn = (params: {
   walletAddress: string;
   username: string;
 }) => any | Promise<any>;

@@ -96,7 +96,10 @@ export class WalletManager {
   ) {
     let entropy = await this.getEntropyFromLocalStorage(localStorage);
     if (entropy) {
-      let walletObj = Authentication.generateWalletFromEntropy(entropy, PATH);
+      const walletObj = await Authentication.generateWalletFromEntropy(
+        entropy,
+        PATH
+      );
 
       if (walletObj) return walletObj;
       else return null;
