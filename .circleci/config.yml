@@ -6,8 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/node:10.15.3
+      - image: circleci/node:14.18
 
     working_directory: ~/audius-hedgehog
 
@@ -15,8 +14,17 @@ jobs:
       - checkout
       - run: npm install
       - run:
+          name: run lint
+          command: npm run lint
+      - run:
+          name: run typecheck
+          command: npm run typecheck
+      - run:
           name: run tests
           command: npm run test
+      - run:
+          name: run build
+          command: npm run build
 
 workflows:
   version: 2

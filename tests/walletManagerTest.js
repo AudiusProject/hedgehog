@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { WalletManager } = require('../index')
+const { WalletManager } = require('../src')
 const { entropy, walletAddress } = require('./helpers')
 const { LocalStorage } = require('node-localstorage')
 
@@ -29,7 +29,7 @@ describe('WalletManager', async function () {
       localStorage
     )
 
-    let decryptedData = await WalletManager.decryptCipherTextAndRetrieveWallet(
+    const decryptedData = await WalletManager.decryptCipherTextAndRetrieveWallet(
       'testpassword',
       data.ivHex,
       data.cipherTextHex
@@ -75,10 +75,10 @@ describe('WalletManager', async function () {
     assert.deepStrictEqual(res2, entropy)
   })
 
-  it(`should check that we can't retrieve a wallet from localhost if entropy is null`, async function () {
+  it('should check that we can\'t retrieve a wallet from localhost if entropy is null', async function () {
     const localStorage = new LocalStorage('./local-storage')
     await WalletManager.deleteEntropyFromLocalStorage(localStorage)
-    let walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(
+    const walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(
       localStorage
     )
 
@@ -88,7 +88,7 @@ describe('WalletManager', async function () {
   it('should check that we can retrieve a wallet from localhost if entropy is not null', async function () {
     const localStorage = new LocalStorage('./local-storage')
     await WalletManager.setEntropyInLocalStorage(entropy, localStorage)
-    let walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(
+    const walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(
       localStorage
     )
 

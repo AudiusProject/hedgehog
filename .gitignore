@@ -7,3 +7,5 @@ node_modules/
 test.js
 local-storage/
 .nyc_output/
+dist
+.log

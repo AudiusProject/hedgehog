@@ -1,11 +1,22 @@
 const assert = require('assert')
-const { Authentication } = require('../index')
+const { Authentication } = require('../src')
 
-const { PATH, ivHex, keyHex, entropy, password, cipherTextHex, walletAddress } = require('./helpers')
+const {
+  PATH,
+  ivHex,
+  keyHex,
+  entropy,
+  password,
+  cipherTextHex,
+  walletAddress
+} = require('./helpers')
 
 describe('Authentication', async function () {
   it('should create a wallet given entropy', async function () {
-    const wallet = Authentication.generateWalletFromEntropy(entropy, PATH)
+    const wallet = await Authentication.generateWalletFromEntropy(
+      entropy,
+      PATH
+    )
 
     // This address is deterministic given an entropy and path
     assert.deepStrictEqual(wallet.getAddressString(), walletAddress)
@@ -33,20 +44,32 @@ describe('Authentication', async function () {
   })
 
   it('should encrypt and return a ciphertext', async function () {
-    const data = await Authentication.encrypt(entropy, Buffer.from(ivHex, 'hex'), Buffer.from(keyHex, 'hex'))
+    const data = await Authentication.encrypt(
+      entropy,
+      Buffer.from(ivHex, 'hex'),
+      Buffer.from(keyHex, 'hex')
+    )
     assert.deepStrictEqual(data.cipherTextHex, cipherTextHex)
   })
 
   it('should decrypt and return entropy', async function () {
-    const data = await Authentication.decrypt(Buffer.from(ivHex, 'hex'), Buffer.from(keyHex, 'hex'), cipherTextHex)
+    const data = await Authentication.decrypt(
+      Buffer.from(ivHex, 'hex'),
+      Buffer.from(keyHex, 'hex'),
+      cipherTextHex
+    )
     assert.deepStrictEqual(data, entropy)
   })
 
   it('should not decrypt and throw error if entropy integrity cannot be verified', async function () {
-    let wrongIVHex = '072251f44fda8f9aad3cc04992372bf7'
+    const wrongIVHex = '072251f44fda8f9aad3cc04992372bf7'
 
     try {
-      await Authentication.decrypt(Buffer.from(wrongIVHex, 'hex'), Buffer.from(keyHex, 'hex'), cipherTextHex)
+      await Authentication.decrypt(
+        Buffer.from(wrongIVHex, 'hex'),
+        Buffer.from(keyHex, 'hex'),
+        cipherTextHex
+      )
       assert.fail('Should not be able to derive entropy for incorrect iv hex')
     } catch (e) {
       assert.deepStrictEqual(1, 1)

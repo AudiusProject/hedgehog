@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { Hedgehog, WalletManager } = require('../index')
+const { Hedgehog, WalletManager } = require('../src')
 const { LocalStorage } = require('node-localstorage')
 const {
   ivHex,
@@ -88,7 +88,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     resetDataInDB()
 
-    let walletObj = await hh.signUp(username, password)
+    const walletObj = await hh.signUp(username, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
 
     assert.deepStrictEqual(hh.isLoggedIn(), true)
@@ -99,7 +99,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
 
-    let walletObj = await hh.login(username, password)
+    const walletObj = await hh.login(username, password)
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
@@ -159,13 +159,13 @@ describe('Hedgehog', async function () {
 
   it('should restore wallet from entropy stored in localStorage', async function () {
     await WalletManager.setEntropyInLocalStorage(entropy, localStorage)
-    let walletObj = await hh.restoreLocalWallet()
+    const walletObj = await hh.restoreLocalWallet()
     assert.deepStrictEqual(walletObj.getAddressString(), walletAddress)
   })
 
   it('should not restore wallet if no entropy stored in localStorage', async function () {
     await WalletManager.deleteEntropyFromLocalStorage(localStorage)
-    let walletObj = await hh.restoreLocalWallet()
+    const walletObj = await hh.restoreLocalWallet()
     assert.deepStrictEqual(walletObj, null)
   })
 
@@ -185,7 +185,7 @@ describe('Hedgehog', async function () {
     assert.deepStrictEqual(hh.isLoggedIn(), false)
     assert.deepStrictEqual(hh.getWallet(), null)
 
-    let walletObj = await hh.createWalletObj(password)
+    const walletObj = await hh.createWalletObj(password)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
   })
