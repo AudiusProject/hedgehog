@@ -1,4 +1,4 @@
-import rollupTypescript from 'rollup-plugin-typescript2'
+import typescript from 'rollup-plugin-typescript2'
 import copy from 'rollup-plugin-copy'
 
 import pkg from './package.json'
@@ -22,7 +22,9 @@ export default [
       './src/authWorker.js'
     ],
     plugins: [
-      rollupTypescript(),
+      typescript({
+        tsconfigOverride: { compilerOptions: { module: 'esnext' } }
+      }),
       copy({ targets: [{ src: './src/authWorker.js', dest: 'dist' }] })
     ]
   }

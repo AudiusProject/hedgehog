@@ -15,6 +15,12 @@ jobs:
       - checkout
       - run: npm install
       - run:
+          name: run lint
+          command: npm run lint
+      - run:
+          name: run typecheck
+          command: npm run typecheck
+      - run:
           name: run tests
           command: npm run test
 
