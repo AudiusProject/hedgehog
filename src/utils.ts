@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import { resolve } from "path";
 import type { PrivateKey } from "./types";
 
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
