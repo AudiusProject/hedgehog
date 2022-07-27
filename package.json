@@ -33,6 +33,17 @@
     "typecheck": "tsc",
     "test": "ts-mocha tests"
   },
+  "standard": {
+    "globals": [
+      "Blob",
+      "self",
+      "Worker",
+      "postMessage",
+      "describe",
+      "it",
+      "beforeEach"
+    ]
+  },
   "author": "",
   "license": "MIT"
 }
