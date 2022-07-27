@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { resolve } from "path";
 import type { PrivateKey } from "./types";
 
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
@@ -59,15 +60,19 @@ export function getPlatformCreateKey() {
    * @param ivHex hex string iv value
    */
   const createKey = async (encryptStr: string, ivHex: string) => {
-    return new Promise<PrivateKey>((resolve, reject) => {
-      if (isWebEnv()) {
+    if (isWebEnv()) {
+      return new Promise<PrivateKey>((resolve) => {
         const worker = WebWorker(require("./authWorker.js").toString());
         worker.postMessage(JSON.stringify({ encryptStr, ivHex }));
 
         worker.onmessage = (event) => {
           resolve(event.data);
         };
-      } else if (isNodeEnv()) {
+      });
+    }
+
+    if (isNodeEnv()) {
+      return new Promise<PrivateKey>((resolve, reject) => {
         const N = 32768;
         const r = 8;
         const p = 1;
@@ -89,20 +94,17 @@ export function getPlatformCreateKey() {
               const keyHex = derivedKey.toString("hex");
 
               // This is the private key
-              let keyBuffer = bufferFromHexString(keyHex);
-
+              const keyBuffer = bufferFromHexString(keyHex);
               resolve({ keyHex, keyBuffer });
             }
           }
         );
-      } else {
-        reject(
-          new Error(
-            "Please pass in valid createKey function into the Hedgehog constructor"
-          )
-        );
-      }
-    });
+      });
+    }
+
+    throw new Error(
+      "Please pass in valid createKey function into the Hedgehog constructor"
+    );
   };
 
   return createKey;
