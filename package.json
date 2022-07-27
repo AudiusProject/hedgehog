@@ -6,23 +6,23 @@
     "node-localstorage": false
   },
   "dependencies": {
-    "bip39": "^3.0.4",
-    "browserify-cipher": "^1.0.1",
-    "ethereumjs-wallet": "^1.0.2",
-    "node-localstorage": "^2.2.1",
-    "randombytes": "^2.1.0",
-    "safe-buffer": "^5.2.1"
+    "bip39": "3.0.4",
+    "browserify-cipher": "1.0.1",
+    "ethereumjs-wallet": "1.0.2",
+    "node-localstorage": "2.2.1",
+    "randombytes": "2.1.0",
+    "safe-buffer": "5.2.1"
   },
   "devDependencies": {
     "@tsconfig/node16-strictest": "1.0.3",
-    "@types/node": "^18.6.1",
-    "@types/randombytes": "^2.0.0",
-    "mocha": "^10.0.0",
-    "rollup": "^2.77.1",
-    "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-typescript2": "^0.32.1",
-    "standard": "^17.0.0",
-    "ts-mocha": "^10.0.0",
+    "@types/node": "18.6.1",
+    "@types/randombytes": "2.0.0",
+    "mocha": "10.0.0",
+    "rollup": "2.77.1",
+    "rollup-plugin-copy": "3.4.0",
+    "rollup-plugin-typescript2": "0.32.1",
+    "standard": "17.0.0",
+    "ts-mocha": "10.0.0",
     "typescript": "4.7.4"
   },
   "main": "dist/index.js",
@@ -32,17 +32,6 @@
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "test": "ts-mocha tests"
-  },
-  "standard": {
-    "globals": [
-      "Blob",
-      "self",
-      "Worker",
-      "postMessage",
-      "describe",
-      "it",
-      "beforeEach"
-    ]
   },
   "author": "",
   "license": "MIT"
