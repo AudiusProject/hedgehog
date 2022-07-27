@@ -1,5 +1,5 @@
 const assert = require('assert')
-const { Authentication } = require('../src')
+const { Authentication, getPlatformCreateKey } = require('../src')
 
 const {
   PATH,
@@ -10,6 +10,8 @@ const {
   cipherTextHex,
   walletAddress
 } = require('./helpers')
+
+const createKey = getPlatformCreateKey()
 
 describe('Authentication', async function () {
   it('should create a wallet given entropy', async function () {
@@ -38,7 +40,7 @@ describe('Authentication', async function () {
 
   it('should create a key', async function () {
     this.timeout(15000)
-    const key = await Authentication.createKey(password, ivHex)
+    const key = await createKey(password, ivHex)
 
     assert.deepStrictEqual(key.keyHex, keyHex)
   })
