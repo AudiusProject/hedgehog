@@ -1,7 +1,9 @@
 const assert = require('assert')
-const { WalletManager } = require('../src')
+const { WalletManager, getPlatformCreateKey } = require('../src')
 const { entropy, walletAddress } = require('./helpers')
 const { LocalStorage } = require('node-localstorage')
+
+const createKey = getPlatformCreateKey()
 
 describe('WalletManager', async function () {
   it('should create a wallet ', async function () {
@@ -10,7 +12,8 @@ describe('WalletManager', async function () {
     const data = await WalletManager.createWalletObj(
       'testpassword',
       undefined,
-      localStorage
+      localStorage,
+      createKey
     )
 
     assert.notDeepStrictEqual(data.ivHex, null)
@@ -26,14 +29,17 @@ describe('WalletManager', async function () {
     const data = await WalletManager.createWalletObj(
       'testpassword',
       undefined,
-      localStorage
+      localStorage,
+      createKey
     )
 
-    const decryptedData = await WalletManager.decryptCipherTextAndRetrieveWallet(
-      'testpassword',
-      data.ivHex,
-      data.cipherTextHex
-    )
+    const decryptedData =
+      await WalletManager.decryptCipherTextAndRetrieveWallet(
+        'testpassword',
+        data.ivHex,
+        data.cipherTextHex,
+        createKey
+      )
     assert.deepStrictEqual(decryptedData.entropy, data.entropy)
     assert.notDeepStrictEqual(decryptedData.walletObj, null)
   })
@@ -44,14 +50,16 @@ describe('WalletManager', async function () {
     const data = await WalletManager.createWalletObj(
       'testpassword',
       undefined,
-      localStorage
+      localStorage,
+      createKey
     )
 
     try {
       await WalletManager.decryptCipherTextAndRetrieveWallet(
         'testpassword2',
         data.ivHex,
-        data.cipherTextHex
+        data.cipherTextHex,
+        createKey
       )
 
       assert.fail(
@@ -75,7 +83,7 @@ describe('WalletManager', async function () {
     assert.deepStrictEqual(res2, entropy)
   })
 
-  it('should check that we can\'t retrieve a wallet from localhost if entropy is null', async function () {
+  it("should check that we can't retrieve a wallet from localhost if entropy is null", async function () {
     const localStorage = new LocalStorage('./local-storage')
     await WalletManager.deleteEntropyFromLocalStorage(localStorage)
     const walletObj = await WalletManager.getWalletObjFromLocalStorageIfExists(

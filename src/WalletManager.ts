@@ -1,4 +1,4 @@
-import type { LocalStorage } from "./types";
+import type { CreateKey, LocalStorage } from "./types";
 import { bufferFromHexString } from "./utils";
 import { Authentication } from "./Authentication";
 
@@ -15,7 +15,8 @@ export class WalletManager {
   static async createWalletObj(
     password: string,
     entropyOverride: string | null = null,
-    localStorage: LocalStorage
+    localStorage: LocalStorage,
+    createKey: CreateKey
   ) {
     let self = this;
     let entropy;
@@ -23,7 +24,7 @@ export class WalletManager {
     if (!password) return new Error("Missing property: password");
 
     const { ivBuffer, ivHex } = Authentication.createIV();
-    const { keyBuffer } = await Authentication.createKey(password, ivHex);
+    const { keyBuffer } = await createKey(password, ivHex);
     if (!entropyOverride) {
       entropy = Authentication.generateMnemonicAndEntropy()["entropy"];
     } else {
@@ -51,9 +52,10 @@ export class WalletManager {
   static async decryptCipherTextAndRetrieveWallet(
     password: string,
     ivHex: string,
-    cipherTextHex: string
+    cipherTextHex: string,
+    createKey: CreateKey
   ) {
-    const { keyBuffer } = await Authentication.createKey(password, ivHex);
+    const { keyBuffer } = await createKey(password, ivHex);
     const ivBuffer = bufferFromHexString(ivHex);
     const decryptedEntrophy = Authentication.decrypt(
       ivBuffer,
@@ -68,16 +70,17 @@ export class WalletManager {
     return { walletObj, entropy: decryptedEntrophy };
   }
 
-  static async createAuthLookupKey(username: string, password: string) {
+  static async createAuthLookupKey(
+    username: string,
+    password: string,
+    createKey: CreateKey
+  ) {
     // lowercase username so the lookupKey is consistently generated to search in the database
     username = username.toLowerCase();
     // This iv is hardcoded because the auth lookup key should be deterministically
     // generated given the same username and password
     const ivHex = "0x4f7242b39969c3ac4c6712524d633ce9";
-    const { keyHex } = await Authentication.createKey(
-      username + ":::" + password,
-      ivHex
-    );
+    const { keyHex } = await createKey(username + ":::" + password, ivHex);
     return keyHex;
   }
 

@@ -12,15 +12,12 @@ import {
 } from "bip39";
 import { hdkey } from "ethereumjs-wallet";
 import randomBytes from "randombytes";
-import crypto from "crypto";
 import Cipher from "browserify-cipher/browser";
 import { Buffer as BufferSafe } from "safe-buffer";
-import { WebWorker, bufferFromHexString } from "./utils";
+import { bufferFromHexString } from "./utils";
 
 const mode = "aes-256-cbc";
 const encryptPrefixStr = "hedgehog-entropy:::";
-
-type Key = { keyHex: string; keyBuffer: Uint8Array };
 
 export class Authentication {
   /**
@@ -64,54 +61,6 @@ export class Authentication {
     const ivHex = ivBuffer.toString("hex");
 
     return { ivHex, ivBuffer };
-  }
-
-  /**
-   * Given a user encryptStr and initialization vector, generate a private key
-   * @param encryptStr String to encrypt (can be user password or some kind of lookup key)
-   * @param ivHex hex string iv value
-   */
-  static async createKey(encryptStr: string, ivHex: string) {
-    return new Promise<Key>((resolve, reject) => {
-      // if this is browser side, use a web worker to create the key
-      // otherwise do it server side with node's crypto module
-      if (typeof window !== "undefined" && window && window.Worker) {
-        const worker = WebWorker(require("./authWorker.js").toString());
-        worker.postMessage(JSON.stringify({ encryptStr, ivHex }));
-
-        worker.onmessage = (event) => {
-          resolve(event.data);
-        };
-      } else {
-        const N = 32768;
-        const r = 8;
-        const p = 1;
-        const dkLen = 32;
-        const encryptStrBuffer = Buffer.from(encryptStr);
-        const ivBuffer = Buffer.from(ivHex);
-        // https://github.com/nodejs/node/issues/21524#issuecomment-400012811
-        const maxmem = 128 * p * r + 128 * (2 + N) * r;
-
-        crypto.scrypt(
-          encryptStrBuffer,
-          ivBuffer,
-          dkLen,
-          { N, r, p, maxmem },
-          (err, derivedKey) => {
-            if (err) {
-              reject(err);
-            } else {
-              const keyHex = derivedKey.toString("hex");
-
-              // This is the private key
-              let keyBuffer = bufferFromHexString(keyHex);
-
-              resolve({ keyHex, keyBuffer });
-            }
-          }
-        );
-      }
-    });
   }
 
   /**

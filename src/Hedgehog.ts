@@ -1,24 +1,17 @@
 import type Wallet from "ethereumjs-wallet";
-import type { LocalStorage } from "./types";
-import { getPlatformLocalStorage, waitUntil } from "./utils";
+import type {
+  CreateKey,
+  GetFn,
+  LocalStorage,
+  SetAuthFn,
+  SetUserFn,
+} from "./types";
+import {
+  getPlatformCreateKey,
+  getPlatformLocalStorage,
+  waitUntil,
+} from "./utils";
 import { WalletManager } from "./WalletManager";
-
-export type GetFn = (params: {
-  lookupKey: string;
-}) =>
-  | Promise<{ iv: string; cipherText: string }>
-  | { iv: string; cipherText: string };
-
-export type SetAuthFn = (params: {
-  iv: string;
-  cipherText: string;
-  lookupKey: string;
-}) => any | Promise<any>;
-
-export type SetUserFn = (params: {
-  walletAddress: string;
-  username: string;
-}) => any | Promise<any>;
 
 export class Hedgehog {
   getFn: GetFn;
@@ -26,6 +19,7 @@ export class Hedgehog {
   setUserFn: SetUserFn;
   wallet: null | Wallet;
   localStorage: LocalStorage;
+  createKey: CreateKey;
   ready: boolean;
 
   constructor(
@@ -33,7 +27,8 @@ export class Hedgehog {
     setAuthFn?: SetAuthFn,
     setUserFn?: SetUserFn,
     useLocalStorage = true,
-    localStorage = getPlatformLocalStorage()
+    localStorage = getPlatformLocalStorage(),
+    createKey = getPlatformCreateKey()
   ) {
     if (getFn && setAuthFn && setUserFn) {
       this.getFn = getFn;
@@ -41,6 +36,7 @@ export class Hedgehog {
       this.setUserFn = setUserFn;
       this.wallet = null;
       this.localStorage = localStorage;
+      this.createKey = createKey;
       this.ready = false;
 
       // If there's entropy in localStorage, recover that and create a wallet object and put it
@@ -91,11 +87,13 @@ export class Hedgehog {
     const createWalletPromise = WalletManager.createWalletObj(
       password,
       null,
-      this.localStorage
+      this.localStorage,
+      this.createKey
     );
     const lookupKeyPromise = WalletManager.createAuthLookupKey(
       username,
-      password
+      password,
+      this.createKey
     );
 
     try {
@@ -150,11 +148,13 @@ export class Hedgehog {
     const createWalletPromise = WalletManager.createWalletObj(
       password,
       entropy,
-      this.localStorage
+      this.localStorage,
+      this.createKey
     );
     const lookupKeyPromise = WalletManager.createAuthLookupKey(
       username,
-      password
+      password,
+      this.createKey
     );
 
     try {
@@ -203,15 +203,18 @@ export class Hedgehog {
     const createWalletPromise = WalletManager.createWalletObj(
       password,
       entropy,
-      this.localStorage
+      this.localStorage,
+      this.createKey
     );
     const lookupKeyPromise = WalletManager.createAuthLookupKey(
       username,
-      password
+      password,
+      this.createKey
     );
     const oldLookupKeyPromise = WalletManager.createAuthLookupKey(
       username,
-      oldPassword
+      oldPassword,
+      this.createKey
     );
     try {
       let [walletResult, lookupKey, oldLookupKey] = await Promise.all([
@@ -247,7 +250,11 @@ export class Hedgehog {
    */
   async login(username: string, password: string) {
     let self = this;
-    let lookupKey = await WalletManager.createAuthLookupKey(username, password);
+    let lookupKey = await WalletManager.createAuthLookupKey(
+      username,
+      password,
+      this.createKey
+    );
     let data = await self.getFn({ lookupKey });
 
     if (data && data.iv && data.cipherText) {
@@ -255,7 +262,8 @@ export class Hedgehog {
         await WalletManager.decryptCipherTextAndRetrieveWallet(
           password,
           data.iv,
-          data.cipherText
+          data.cipherText,
+          this.createKey
         );
 
       // set wallet property on the class
@@ -285,7 +293,8 @@ export class Hedgehog {
 
     const lookupKey = await WalletManager.createAuthLookupKey(
       username,
-      password
+      password,
+      this.createKey
     );
     const data = await self.getFn({ lookupKey });
 
@@ -294,7 +303,8 @@ export class Hedgehog {
         await WalletManager.decryptCipherTextAndRetrieveWallet(
           password,
           data.iv,
-          data.cipherText
+          data.cipherText,
+          this.createKey
         );
 
       // test against current entropy in localStorage and current wallet
@@ -360,7 +370,8 @@ export class Hedgehog {
       const walletResult = await WalletManager.createWalletObj(
         password,
         null,
-        this.localStorage
+        this.localStorage,
+        this.createKey
       );
       if (walletResult instanceof Error) throw walletResult;
       const { walletObj, entropy } = walletResult;
