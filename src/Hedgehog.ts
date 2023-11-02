@@ -30,6 +30,7 @@ export class Hedgehog {
     localStorage = getPlatformLocalStorage(),
     createKey = getPlatformCreateKey()
   ) {
+    console.log('asdf hedgehog')
     if (getFn && setAuthFn && setUserFn) {
       this.getFn = getFn;
       this.setAuthFn = setAuthFn;
@@ -82,6 +83,7 @@ export class Hedgehog {
    * @returns ethereumjs-wallet wallet object
    */
   async signUp(username: string, password: string) {
+    console.log("asdf hedgehog sign up")
     let self = this;
 
     const createWalletPromise = WalletManager.createWalletObj(
@@ -117,8 +119,8 @@ export class Hedgehog {
         username: username,
         walletAddress: walletAddress,
       };
-      await self.setUserFn(userData);
       await self.setAuthFn(authData);
+      await self.setUserFn(userData);
 
       // set the wallet at the very end to make sure the isLoggedIn() function doesn't return true
       self.wallet = walletObj;
