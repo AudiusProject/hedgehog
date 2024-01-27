@@ -76,7 +76,7 @@ describe('Hedgehog', async function () {
     resetDataInDB()
 
     try {
-      await hh.login(username, password)
+      await hh.login({ username, password })
       assert.fail("Should not login if there's non user record")
     } catch (e) {
       assert.deepStrictEqual(1, 1)
@@ -88,7 +88,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     resetDataInDB()
 
-    const walletObj = await hh.signUp(username, password)
+    const walletObj = await hh.signUp({ username, password })
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
 
     assert.deepStrictEqual(hh.isLoggedIn(), true)
@@ -99,7 +99,7 @@ describe('Hedgehog', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
 
-    const walletObj = await hh.login(username, password)
+    const walletObj = await hh.login({ username, password })
     assert.notDeepStrictEqual(walletObj.getAddressString(), null)
     assert.deepStrictEqual(hh.isLoggedIn(), true)
     assert.deepStrictEqual(hh.getWallet(), walletObj)
@@ -114,12 +114,12 @@ describe('Hedgehog', async function () {
     setDataInDB(authValues, userValues)
     await hh.login(username, password)
     assert.strictEqual(
-      await hh.confirmCredentials(username, password + '~'),
+      await hh.confirmCredentials({ username, password: password + '~' }),
       false,
       'credentials should not confirm - wrong password'
     )
     assert.strictEqual(
-      await hh.confirmCredentials(username, password),
+      await hh.confirmCredentials({ username, password }),
       true,
       'credentials should confirm'
     )
@@ -128,7 +128,7 @@ describe('Hedgehog', async function () {
   it('should fail credential confirmation as not logged in', async function () {
     this.timeout(15000)
     assert.strictEqual(
-      await hh.confirmCredentials(username, password),
+      await hh.confirmCredentials({ username, password }),
       false,
       'credentials should not confirm - not logged in'
     )
@@ -137,7 +137,7 @@ describe('Hedgehog', async function () {
   it('should fail credential confirmation as the credentials are for the wrong user', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
-    await hh.login(username, password)
+    await hh.login({ username, password })
     setDataInDB(
       {
         iv: users[1].ivHex,
@@ -147,8 +147,10 @@ describe('Hedgehog', async function () {
       { walletAddress: users[1].walletAddress, username: users[1].username }
     )
     const result = await hh.confirmCredentials(
-      users[1].username,
-      users[1].password
+      {
+        username: users[1].username,
+        password: users[1].password
+      }
     )
     assert.strictEqual(
       result,
