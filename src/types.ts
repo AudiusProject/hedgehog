@@ -13,6 +13,7 @@ export type PrivateKey = { keyHex: string; keyBuffer: Uint8Array };
 
 export type GetFn = (params: {
   lookupKey: string;
+  [key: string]: unknown;
 }) =>
   | Promise<{ iv: string; cipherText: string }>
   | { iv: string; cipherText: string };
@@ -21,9 +22,12 @@ export type SetAuthFn = (params: {
   iv: string;
   cipherText: string;
   lookupKey: string;
+  oldLookupKey?: string;
+  [key: string]: unknown;
 }) => any | Promise<any>;
 
 export type SetUserFn = (params: {
   walletAddress: string;
   username: string;
+  [key: string]: unknown;
 }) => any | Promise<any>;
