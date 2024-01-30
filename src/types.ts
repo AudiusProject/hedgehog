@@ -31,3 +31,17 @@ export type SetUserFn = (params: {
   username: string;
   [key: string]: unknown;
 }) => any | Promise<any>;
+
+export type LoginArgs = {
+  username: string;
+  password: string;
+  [key: string]: unknown;
+};
+
+export type ChangeCredentialsArgs = {
+  newUsername: string;
+  newPassword: string;
+  oldUsername: string;
+  oldPassword: string;
+  [key: string]: unknown;
+};
