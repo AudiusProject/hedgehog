@@ -1,10 +1,12 @@
 import type Wallet from "ethereumjs-wallet";
 import type {
+  ChangeCredentialsArgs,
   CreateKey,
   GetFn,
   LocalStorage,
   SetAuthFn,
   SetUserFn,
+  LoginArgs,
 } from "./types";
 import {
   getPlatformCreateKey,
@@ -77,11 +79,9 @@ export class Hedgehog {
   /**
    * Given user credentials, create a client side wallet and all other authentication artifacts,
    * call setFn to persist the artifacts to a server and return the wallet object
-   * @param username username
-   * @param password user password
    * @returns ethereumjs-wallet wallet object
    */
-  async signUp(username: string, password: string) {
+  async signUp({ username, password, ...optionalParams }: LoginArgs) {
     let self = this;
 
     const createWalletPromise = WalletManager.createWalletObj(
@@ -108,12 +108,14 @@ export class Hedgehog {
       const walletAddress = walletObj.getAddressString();
 
       const authData = {
+        ...optionalParams,
         iv: ivHex,
         cipherText: cipherTextHex,
         lookupKey: lookupKey,
       };
 
       const userData = {
+        ...optionalParams,
         username: username,
         walletAddress: walletAddress,
       };
@@ -133,10 +135,8 @@ export class Hedgehog {
   /**
    * Generate new set of auth credentials to allow login
    * If the old password is included, the setAuthFn will include the old lookup key for deletion
-   * @param username - username
-   * @param password - new password
    */
-  async resetPassword(username: string, password: string) {
+  async resetPassword({ username, password, ...optionalParams }: LoginArgs) {
     let self = this;
     let entropy = await WalletManager.getEntropyFromLocalStorage(
       this.localStorage
@@ -167,6 +167,7 @@ export class Hedgehog {
       const { ivHex, cipherTextHex, walletObj } = walletResult;
 
       const authData = {
+        ...optionalParams,
         iv: ivHex,
         cipherText: cipherTextHex,
         lookupKey: lookupKey,
@@ -181,17 +182,16 @@ export class Hedgehog {
   }
 
   /**
-   * Generate new set of auth credentials to allow login and remove the old password
+   * Generate new set of auth credentials to allow login and remove the old credentials
    * Note: Doesn't log out on error
-   * @param username - username
-   * @param password - new password
-   * @param oldPassword - old password
    */
-  async changePassword(
-    username: string,
-    password: string,
-    oldPassword: string
-  ) {
+  async changeCredentials({
+    newUsername,
+    newPassword,
+    oldUsername,
+    oldPassword,
+    ...optionalParams
+  }: ChangeCredentialsArgs) {
     let self = this;
     let entropy = await WalletManager.getEntropyFromLocalStorage(
       this.localStorage
@@ -201,18 +201,18 @@ export class Hedgehog {
     }
 
     const createWalletPromise = WalletManager.createWalletObj(
-      password,
+      newPassword,
       entropy,
       this.localStorage,
       this.createKey
     );
     const lookupKeyPromise = WalletManager.createAuthLookupKey(
-      username,
-      password,
+      newUsername,
+      newPassword,
       this.createKey
     );
     const oldLookupKeyPromise = WalletManager.createAuthLookupKey(
-      username,
+      oldUsername !== undefined ? oldUsername : newUsername,
       oldPassword,
       this.createKey
     );
@@ -228,6 +228,7 @@ export class Hedgehog {
       const { ivHex, cipherTextHex, walletObj } = walletResult;
 
       const authData = {
+        ...optionalParams,
         iv: ivHex,
         cipherText: cipherTextHex,
         lookupKey: lookupKey,
@@ -244,18 +245,16 @@ export class Hedgehog {
   /**
    * Given user credentials, attempt to get authentication artifacts from server using
    * getFn, create the private key using the artifacts and the user password
-   * @param username username
-   * @param password user password
    * @returns ethereumjs-wallet wallet object
    */
-  async login(username: string, password: string) {
+  async login({ username, password, ...optionalParams }: LoginArgs) {
     let self = this;
     let lookupKey = await WalletManager.createAuthLookupKey(
       username,
       password,
       this.createKey
     );
-    let data = await self.getFn({ lookupKey });
+    let data = await self.getFn({ ...optionalParams, lookupKey });
 
     if (data && data.iv && data.cipherText) {
       const { walletObj, entropy } =
@@ -279,11 +278,13 @@ export class Hedgehog {
 
   /**
    * Confirms the user credentials given generate the same entropy after using artifacts from the server
-   * @param username username
-   * @param password user password
    * @returns whether or not the credentials are valid for the current user
    */
-  async confirmCredentials(username: string, password: string) {
+  async confirmCredentials({
+    username,
+    password,
+    ...optionalParams
+  }: LoginArgs) {
     const self = this;
 
     const existingEntropy = await WalletManager.getEntropyFromLocalStorage(
@@ -296,7 +297,7 @@ export class Hedgehog {
       password,
       this.createKey
     );
-    const data = await self.getFn({ lookupKey });
+    const data = await self.getFn({ ...optionalParams, lookupKey });
 
     if (data && data.iv && data.cipherText) {
       const { walletObj, entropy } =
