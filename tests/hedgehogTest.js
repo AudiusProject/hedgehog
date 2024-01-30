@@ -112,7 +112,7 @@ describe('Hedgehog', async function () {
   it('should log in and fail one credential confirmation and pass the other', async function () {
     this.timeout(15000)
     setDataInDB(authValues, userValues)
-    await hh.login(username, password)
+    await hh.login({ username, password })
     assert.strictEqual(
       await hh.confirmCredentials({ username, password: password + '~' }),
       false,
